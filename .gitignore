@@ -3,6 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Database files (too large for GitHub and user-specific)
+database/*.accdb
+database/*.laccdb
+*.accdb
+*.laccdb
+
 # User-specific files
 *.rsuser
 *.suo
