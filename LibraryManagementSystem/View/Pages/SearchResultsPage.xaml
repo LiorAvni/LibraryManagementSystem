@@ -1,0 +1,243 @@
+<Page x:Class="LibraryManagementSystem.View.Pages.SearchResultsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Search Results"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <!-- Primary Button Style -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980b9"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#95a5a6"/>
+                    <Setter Property="Cursor" Value="No"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Secondary Button Style (for Reserve) -->
+        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#27ae60"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#229954"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="#f5f5f5">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Margin="30">
+                <!-- Header Section -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Search Summary Card -->
+                <Border Grid.Row="0" Background="White" Padding="25" CornerRadius="10" Margin="0,0,0,20">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock x:Name="txtResultsTitle" 
+                                       Text="?? Search Results" 
+                                       FontSize="24" 
+                                       FontWeight="Bold" 
+                                       Foreground="#2c3e50"/>
+                            <TextBlock x:Name="txtSearchQuery" 
+                                       Margin="0,8,0,0" 
+                                       FontSize="14" 
+                                       Foreground="#7f8c8d"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock x:Name="txtTotalResults" 
+                                       Margin="0,5,0,0" 
+                                       FontSize="16" 
+                                       FontWeight="SemiBold" 
+                                       Foreground="#3498db"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="1" 
+                                Content="? Back to Search" 
+                                Style="{StaticResource PrimaryButton}"
+                                Click="BackToSearch_Click"
+                                Height="40"
+                                Padding="20,10"/>
+                    </Grid>
+                </Border>
+
+                <!-- Results Grid -->
+                <ItemsControl x:Name="booksGrid" Grid.Row="1">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="White" 
+                                    Margin="0,0,0,15" 
+                                    Padding="25" 
+                                    CornerRadius="10">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" Opacity="0.05" ShadowDepth="2" BlurRadius="8"/>
+                                </Border.Effect>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Book Details -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Title}" 
+                                                   FontSize="20" 
+                                                   FontWeight="Bold" 
+                                                   Foreground="#2c3e50" 
+                                                   TextWrapping="Wrap"/>
+                                        
+                                        <TextBlock Margin="0,8,0,0" 
+                                                   FontSize="14" 
+                                                   Foreground="#7f8c8d">
+                                            <Run Text="by "/>
+                                            <Run Text="{Binding Author}" FontWeight="SemiBold"/>
+                                        </TextBlock>
+
+                                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                            <TextBlock Text="?? Category: " 
+                                                       FontSize="13" 
+                                                       Foreground="#7f8c8d"/>
+                                            <TextBlock Text="{Binding Category}" 
+                                                       FontSize="13" 
+                                                       FontWeight="SemiBold" 
+                                                       Foreground="#3498db"/>
+                                            
+                                            <TextBlock Text=" | Publisher: " 
+                                                       FontSize="13" 
+                                                       Foreground="#7f8c8d" 
+                                                       Margin="15,0,0,0"/>
+                                            <TextBlock Text="{Binding Publisher}" 
+                                                       FontSize="13" 
+                                                       Foreground="#7f8c8d"/>
+                                            
+                                            <TextBlock Text=" | Year: " 
+                                                       FontSize="13" 
+                                                       Foreground="#7f8c8d" 
+                                                       Margin="15,0,0,0"/>
+                                            <TextBlock Text="{Binding Year}" 
+                                                       FontSize="13" 
+                                                       Foreground="#7f8c8d"/>
+                                        </StackPanel>
+
+                                        <!-- Availability Badge -->
+                                        <Border Margin="0,12,0,0" 
+                                                Background="{Binding StatusBadgeStyle.Setters[0].Value}" 
+                                                Padding="12,6" 
+                                                CornerRadius="5" 
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="?? " FontSize="14"/>
+                                                <TextBlock Text="{Binding StatusText}" 
+                                                           Style="{Binding StatusTextStyle}" 
+                                                           FontSize="13"/>
+                                                <TextBlock Text=": " 
+                                                           Style="{Binding StatusTextStyle}" 
+                                                           FontSize="13"/>
+                                                <TextBlock Text="{Binding AvailableCopies}" 
+                                                           Style="{Binding StatusTextStyle}" 
+                                                           FontSize="13" 
+                                                           FontWeight="Bold"/>
+                                                <TextBlock Text=" / " 
+                                                           Style="{Binding StatusTextStyle}" 
+                                                           FontSize="13"/>
+                                                <TextBlock Text="{Binding TotalCopies}" 
+                                                           Style="{Binding StatusTextStyle}" 
+                                                           FontSize="13"/>
+                                                <TextBlock Text=" available" 
+                                                           Style="{Binding StatusTextStyle}" 
+                                                           FontSize="13"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Grid.Column="1" 
+                                                Orientation="Horizontal" 
+                                                VerticalAlignment="Center" 
+                                                Margin="20,0,0,0">
+                                        <Button Content="?? Borrow" 
+                                                Style="{StaticResource PrimaryButton}"
+                                                Margin="0,0,10,0"
+                                                Click="BorrowBook_Click"
+                                                Tag="{Binding}"
+                                                IsEnabled="{Binding IsAvailable}"
+                                                Width="120"/>
+                                        <Button Content="?? Reserve" 
+                                                Style="{StaticResource SecondaryButton}"
+                                                Click="ReserveBook_Click"
+                                                Tag="{Binding}"
+                                                Width="120"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- No Results Message -->
+                <Border x:Name="noResultsPanel" 
+                        Grid.Row="1" 
+                        Background="White" 
+                        Padding="40" 
+                        CornerRadius="10" 
+                        Visibility="Collapsed">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                    </Border.Effect>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="??" FontSize="64" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                        <TextBlock Text="No books found" 
+                                   FontSize="24" 
+                                   FontWeight="Bold" 
+                                   Foreground="#2c3e50" 
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Try adjusting your search criteria or browse all available books" 
+                                   FontSize="16" 
+                                   Foreground="#7f8c8d" 
+                                   HorizontalAlignment="Center" 
+                                   Margin="0,10,0,20"/>
+                        <Button Content="Browse All Books" 
+                                Style="{StaticResource PrimaryButton}"
+                                Click="BrowseAll_Click"
+                                Padding="25,12"
+                                FontSize="16"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -1,0 +1,269 @@
+<Page x:Class="LibraryManagementSystem.View.Pages.NewArrivalsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="New Arrivals"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <!-- Badge Styles -->
+        <Style x:Key="BadgeAvailable" TargetType="Border">
+            <Setter Property="Background" Value="#d4edda"/>
+            <Setter Property="Padding" Value="5,5"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+        <Style x:Key="BadgeAvailableText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#155724"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        
+        <Style x:Key="BadgeUnavailable" TargetType="Border">
+            <Setter Property="Background" Value="#f8d7da"/>
+            <Setter Property="Padding" Value="5,5"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+        <Style x:Key="BadgeUnavailableText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#721c24"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <!-- Button Styles -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980b9"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#bdc3c7"/>
+                    <Setter Property="Foreground" Value="#7f8c8d"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#95a5a6"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#7f8c8d"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#f5f5f5">
+            <Grid MaxWidth="1200" Margin="30,30,30,30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header Card -->
+            <Border Grid.Row="0" Background="White" Padding="20" CornerRadius="10" Margin="0,0,0,20">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock FontSize="24" FontWeight="SemiBold" Foreground="#2c3e50">
+                        <Run Text="?? New Arrivals ("/>
+                        <Run x:Name="txtTotalBooks" Text="0"/>
+                        <Run Text=" books)"/>
+                    </TextBlock>
+                    <TextBlock Text="Books added to our library in the last 90 days - sorted by newest first" 
+                               FontSize="13" Foreground="#7f8c8d" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Search and Filters -->
+            <Border Grid.Row="1" Background="White" Padding="20" CornerRadius="10" Margin="0,0,0,20">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                </Border.Effect>
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Box -->
+                        <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                            <TextBlock Text="?? Search" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <TextBox x:Name="txtSearch" 
+                                     Padding="10" 
+                                     FontSize="14"
+                                     KeyDown="TxtSearch_KeyDown"/>
+                        </StackPanel>
+
+                        <!-- Category Filter -->
+                        <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                            <TextBlock Text="?? Category" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <ComboBox x:Name="cmbCategory" 
+                                      Padding="10" 
+                                      FontSize="14"
+                                      SelectionChanged="Filter_Changed">
+                                <ComboBoxItem Content="All Categories" IsSelected="True" Tag=""/>
+                                <ComboBoxItem Content="Fiction" Tag="Fiction"/>
+                                <ComboBoxItem Content="Non-Fiction" Tag="Non-Fiction"/>
+                                <ComboBoxItem Content="Science" Tag="Science"/>
+                                <ComboBoxItem Content="Technology" Tag="Technology"/>
+                                <ComboBoxItem Content="History" Tag="History"/>
+                                <ComboBoxItem Content="Biography" Tag="Biography"/>
+                                <ComboBoxItem Content="Mystery" Tag="Mystery"/>
+                                <ComboBoxItem Content="Romance" Tag="Romance"/>
+                                <ComboBoxItem Content="Fantasy" Tag="Fantasy"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Available Only Checkbox -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="? Availability" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <Border Background="#f8f9fa" BorderBrush="#ddd" BorderThickness="1" CornerRadius="5" Padding="10">
+                                <CheckBox x:Name="chkAvailableOnly" 
+                                          Content="Available only" 
+                                          FontSize="14"
+                                          Checked="Filter_Changed"
+                                          Unchecked="Filter_Changed"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Filter Buttons -->
+                    <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+                        <Button Content="Apply Filters" 
+                                Style="{StaticResource PrimaryButton}" 
+                                Padding="30,10"
+                                Click="ApplyFilters_Click"
+                                Margin="0,0,10,0"/>
+                        <Button Content="Clear All" 
+                                Style="{StaticResource SecondaryButton}" 
+                                Padding="30,10"
+                                Click="ClearFilters_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Books Grid -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="booksGrid">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="White" 
+                                    Width="350" 
+                                    Margin="0,0,20,20" 
+                                    Padding="20" 
+                                    CornerRadius="10"
+                                    BorderBrush="#e74c3c"
+                                    BorderThickness="0,0,0,4">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <!-- NEW Tag -->
+                                    <Border Background="#e74c3c" 
+                                            CornerRadius="5" 
+                                            Padding="5,5" 
+                                            HorizontalAlignment="Right" 
+                                            VerticalAlignment="Top"
+                                            Margin="-10,-10,0,0">
+                                        <TextBlock Text="NEW" 
+                                                   Foreground="White" 
+                                                   FontSize="11" 
+                                                   FontWeight="Bold"/>
+                                    </Border>
+
+                                    <StackPanel Margin="0,20,0,0">
+                                        <!-- Book Title -->
+                                        <TextBlock Text="{Binding Title}" 
+                                                   FontSize="18" 
+                                                   FontWeight="Bold" 
+                                                   Foreground="#2c3e50" 
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,0,0,10"/>
+
+                                        <!-- Book Info -->
+                                        <StackPanel Margin="0,10,0,0">
+                                            <TextBlock Margin="0,0,0,5">
+                                                <Run Text="Author: " FontWeight="SemiBold" Foreground="#2c3e50"/>
+                                                <Run Text="{Binding Author}" Foreground="#555"/>
+                                            </TextBlock>
+                                            <TextBlock Margin="0,0,0,5">
+                                                <Run Text="Publisher: " FontWeight="SemiBold" Foreground="#2c3e50"/>
+                                                <Run Text="{Binding Publisher}" Foreground="#555"/>
+                                            </TextBlock>
+                                            <TextBlock Margin="0,0,0,5">
+                                                <Run Text="Year: " FontWeight="SemiBold" Foreground="#2c3e50"/>
+                                                <Run Text="{Binding Year}" Foreground="#555"/>
+                                            </TextBlock>
+                                            <TextBlock Margin="0,0,0,5">
+                                                <Run Text="Category: " FontWeight="SemiBold" Foreground="#2c3e50"/>
+                                                <Run Text="{Binding Category}" Foreground="#555"/>
+                                            </TextBlock>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                                <TextBlock FontWeight="SemiBold" Foreground="#2c3e50" Text="Available: " VerticalAlignment="Center"/>
+                                                <TextBlock Foreground="#555" VerticalAlignment="Center" Margin="5,0">
+                                                    <Run Text="{Binding AvailableCopies}"/>
+                                                    <Run Text=" / "/>
+                                                    <Run Text="{Binding TotalCopies}"/>
+                                                </TextBlock>
+                                                <Border Style="{Binding StatusBadgeStyle}" Margin="5,0,0,0">
+                                                    <TextBlock Text="{Binding StatusText}" Style="{Binding StatusTextStyle}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!-- Action Buttons -->
+                                        <Grid Margin="0,15,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <Button Grid.Column="0" 
+                                                    Content="?? Borrow" 
+                                                    Style="{StaticResource PrimaryButton}"
+                                                    Margin="0,0,5,0"
+                                                    IsEnabled="{Binding IsAvailable}"
+                                                    Click="BorrowBook_Click"
+                                                    Tag="{Binding}"/>
+                                            <Button Grid.Column="1" 
+                                                    Content="?? Reserve" 
+                                                    Style="{StaticResource SecondaryButton}"
+                                                    Margin="5,0,0,0"
+                                                    Click="ReserveBook_Click"
+                                                    Tag="{Binding}"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </ScrollViewer>
+</Page>

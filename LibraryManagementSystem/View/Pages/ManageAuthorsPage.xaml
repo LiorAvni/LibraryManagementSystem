@@ -1,0 +1,285 @@
+<Page x:Class="LibraryManagementSystem.View.Pages.ManageAuthorsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Manage Authors"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <!-- Button Styles -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980b9"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#bdc3c7"/>
+                    <Setter Property="Foreground" Value="#7f8c8d"/>
+                    <Setter Property="Cursor" Value="No"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#27ae60"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#229954"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#e74c3c"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#c0392b"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#95a5a6"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#7f8c8d"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Navigation Menu -->
+        <Border Grid.Row="0" Background="#34495e" Padding="0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="btnNavDashboard" 
+                        Content="? Dashboard" 
+                        Background="Transparent"
+                        Foreground="White"
+                        BorderThickness="0,0,0,3"
+                        BorderBrush="#3498db"
+                        Padding="20,12"
+                        FontWeight="SemiBold"
+                        FontSize="14"
+                        Cursor="Hand"
+                        Click="NavDashboard_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                Padding="{TemplateBinding Padding}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                BorderBrush="{TemplateBinding BorderBrush}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#3d4f63"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#f5f5f5">
+        <StackPanel Margin="30">
+            <!-- Header -->
+            <Border Background="White" Padding="30" Margin="0,0,0,20">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Manage Authors" FontSize="24" FontWeight="Bold" Foreground="#2c3e50" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Content="+ Add New Author" Style="{StaticResource SuccessButton}" Padding="20,10" Click="AddAuthor_Click"/>
+                </Grid>
+            </Border>
+
+            <StackPanel>
+                <!-- Filter Section -->
+                <Border Background="White" Padding="20" CornerRadius="10" Margin="0,0,0,20">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Author Name:" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                                <TextBox x:Name="txtSearchName" 
+                                         Padding="10" 
+                                         FontSize="14" 
+                                         BorderBrush="#ddd" 
+                                         BorderThickness="1"
+                                         KeyDown="TxtSearchName_KeyDown">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Style.Triggers>
+                                                <Trigger Property="Text" Value="">
+                                                    <Setter Property="Background">
+                                                        <Setter.Value>
+                                                            <VisualBrush Stretch="None" AlignmentX="Left">
+                                                                <VisualBrush.Visual>
+                                                                    <TextBlock Text="Search by first or last name..." 
+                                                                               Foreground="#999" 
+                                                                               Margin="5,0,0,0"/>
+                                                                </VisualBrush.Visual>
+                                                            </VisualBrush>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Orientation="Horizontal">
+                                <Button Content="?? Search" Style="{StaticResource PrimaryButton}" Padding="16,10" Margin="0,0,5,0" Click="Search_Click"/>
+                                <Button Content="Clear" Style="{StaticResource SecondaryButton}" Padding="16,10" Click="Clear_Click"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <TextBlock x:Name="txtFilterInfo" Margin="0,15,0,0" Foreground="#7f8c8d" FontSize="14"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Authors Table -->
+                <Border Background="White" Padding="30" CornerRadius="10">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <DataGrid x:Name="dgAuthors" 
+                                  AutoGenerateColumns="False" 
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="None"
+                                  Background="White"
+                                  RowBackground="White"
+                                  AlternatingRowBackground="#f8f9fa"
+                                  BorderThickness="1"
+                                  BorderBrush="#dee2e6"
+                                  CanUserResizeRows="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding FullName}" Width="200"/>
+                                <DataGridTextColumn Header="Biography" Binding="{Binding BiographyPreview}" Width="*" MinWidth="300"/>
+                                <DataGridTextColumn Header="Birth Date" Binding="{Binding BirthDateFormatted}" Width="120"/>
+                                <DataGridTemplateColumn Header="Actions" Width="180">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="?? Edit" 
+                                                        Style="{StaticResource PrimaryButton}" 
+                                                        Padding="8,4"
+                                                        FontSize="12"
+                                                        Margin="0,0,5,0"
+                                                        Click="EditAuthor_Click"
+                                                        Tag="{Binding}"/>
+                                                <Button Content="??? Delete" 
+                                                        Style="{StaticResource DangerButton}" 
+                                                        Padding="8,4"
+                                                        FontSize="12"
+                                                        Click="DeleteAuthor_Click"
+                                                        Tag="{Binding}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#ecf0f1"/>
+                                    <Setter Property="Foreground" Value="#2c3e50"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Padding" Value="12"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                    <Setter Property="BorderBrush" Value="#bdc3c7"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Padding" Value="12"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="#ecf0f1"/>
+                                </Style>
+                            </DataGrid.CellStyle>
+
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#f8f9fa"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                        </DataGrid>
+
+                        <!-- Pagination -->
+                        <Border x:Name="paginationSection" Background="#f8f9fa" Padding="15" CornerRadius="8" Margin="0,20,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="txtPaginationInfo" Grid.Column="0" Foreground="#666" FontSize="14" VerticalAlignment="Center"/>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button x:Name="btnFirstPage" Content="First" Style="{StaticResource PrimaryButton}" Padding="12,8" Margin="0,0,5,0" Click="FirstPage_Click"/>
+                                    <Button x:Name="btnPrevPage" Content="Previous" Style="{StaticResource PrimaryButton}" Padding="12,8" Margin="0,0,5,0" Click="PrevPage_Click"/>
+                                    <Button x:Name="btnNextPage" Content="Next" Style="{StaticResource PrimaryButton}" Padding="12,8" Margin="0,0,5,0" Click="NextPage_Click"/>
+                                    <Button x:Name="btnLastPage" Content="Last" Style="{StaticResource PrimaryButton}" Padding="12,8" Click="LastPage_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+    </Grid>
+</Page>
