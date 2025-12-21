@@ -234,11 +234,6 @@ namespace LibraryManagementSystem.View.Pages
                 }
             }
         }
-
-        private void NavDashboard_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService?.Navigate(new LibrarianDashboard());
-        }
     }
 
     // Model for displaying member data in DataGrid

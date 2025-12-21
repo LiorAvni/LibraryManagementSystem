@@ -8,110 +8,243 @@
       d:DesignHeight="700" d:DesignWidth="1200"
       Title="Login">
 
-    <Grid Background="White">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="400"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <Page.Resources>
+        <!-- Button Style -->
+        <Style x:Key="LoginButtonStyle" TargetType="Button">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#667eea" Offset="0"/>
+                        <GradientStop Color="#764ba2" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <TranslateTransform Y="-2"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-        <!-- Login Form -->
-        <Border Grid.Column="1" 
-                Background="White" 
-                BorderBrush="#2E3B4E" 
-                BorderThickness="2" 
+        <!-- TextBox Style -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="BorderBrush" Value="#ddd"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#667eea"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- PasswordBox Style -->
+        <Style x:Key="ModernPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="BorderBrush" Value="#ddd"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#667eea"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <!-- Gradient Background -->
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#667eea" Offset="0"/>
+                <GradientStop Color="#764ba2" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Login Container -->
+        <Border Background="White" 
                 CornerRadius="10" 
                 Padding="40"
+                Width="400"
                 VerticalAlignment="Center"
-                Effect="{DynamicResource DropShadowEffect}">
-            
+                HorizontalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" Opacity="0.2" ShadowDepth="10" BlurRadius="25"/>
+            </Border.Effect>
+
             <StackPanel>
-                <!-- Logo/Title -->
-                <TextBlock Text="??" 
-                          FontSize="60" 
+                <!-- Header -->
+                <TextBlock Text="?? Library System" 
+                          FontSize="28" 
+                          FontWeight="Bold"
                           HorizontalAlignment="Center" 
-                          Margin="0,0,0,20"/>
-                
-                <TextBlock Text="Library Management System" 
-                          FontSize="24" 
-                          FontWeight="Bold" 
-                          HorizontalAlignment="Center" 
-                          Foreground="#2E3B4E"
+                          Foreground="#333"
                           Margin="0,0,0,10"/>
                 
                 <TextBlock Text="Please login to continue" 
                           FontSize="14" 
                           HorizontalAlignment="Center" 
-                          Foreground="Gray"
+                          Foreground="#666"
                           Margin="0,0,0,30"/>
 
-                <!-- Email -->
-                <TextBlock Text="Email:" 
-                          FontWeight="SemiBold" 
-                          Margin="0,0,0,5"/>
-                <TextBox x:Name="txtEmail" 
-                        Height="35" 
-                        FontSize="14"
-                        Padding="10,7"
+                <!-- Error Message -->
+                <Border x:Name="errorBorder"
+                        Background="#fee" 
+                        BorderBrush="#fcc"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="10"
                         Margin="0,0,0,20"
-                        Text="admin@library.com"/>
+                        Visibility="Collapsed">
+                    <TextBlock x:Name="txtMessage" 
+                              Text="" 
+                              Foreground="#c33"
+                              TextAlignment="Center"
+                              TextWrapping="Wrap"/>
+                </Border>
 
-                <!-- Password -->
-                <TextBlock Text="Password:" 
-                          FontWeight="SemiBold" 
-                          Margin="0,0,0,5"/>
-                <PasswordBox x:Name="txtPassword" 
-                            Height="35" 
-                            FontSize="14"
-                            Padding="10,7"
-                            Margin="0,0,0,10"
-                            PasswordChanged="TxtPassword_PasswordChanged"/>
+                <!-- Email Field -->
+                <StackPanel Margin="0,0,0,20">
+                    <TextBlock Text="Email" 
+                              FontWeight="Medium" 
+                              Foreground="#333"
+                              Margin="0,0,0,5"/>
+                    <TextBox x:Name="txtEmail" 
+                            Style="{StaticResource ModernTextBox}"
+                            Text="admin@library.com"/>
+                </StackPanel>
 
-                <!-- Remember Me -->
-                <CheckBox x:Name="chkRememberMe" 
-                         Content="Remember Me" 
-                         Margin="0,0,0,25"/>
+                <!-- Password Field -->
+                <StackPanel Margin="0,0,0,20">
+                    <TextBlock Text="Password" 
+                              FontWeight="Medium" 
+                              Foreground="#333"
+                              Margin="0,0,0,5"/>
+                    <PasswordBox x:Name="txtPassword" 
+                                Style="{StaticResource ModernPasswordBox}"
+                                PasswordChanged="TxtPassword_PasswordChanged"/>
+                </StackPanel>
 
                 <!-- Login Button -->
                 <Button x:Name="btnLogin" 
                        Content="Login" 
-                       Height="40" 
-                       FontSize="16" 
-                       FontWeight="Bold"
-                       Background="#4CAF50" 
-                       Foreground="White"
-                       BorderThickness="0"
-                       Cursor="Hand"
+                       Height="45"
+                       Style="{StaticResource LoginButtonStyle}"
                        Click="BtnLogin_Click"
-                       Margin="0,0,0,15"/>
-
-                <!-- Message -->
-                <TextBlock x:Name="txtMessage" 
-                          Text="" 
-                          Foreground="Red" 
-                          TextAlignment="Center"
-                          TextWrapping="Wrap"
-                          Visibility="Collapsed"/>
-
-                <!-- Divider -->
-                <Separator Margin="0,20,0,20"/>
+                       Margin="0,0,0,20"/>
 
                 <!-- Register Link -->
-                <TextBlock HorizontalAlignment="Center">
-                    <Run Text="Don't have an account? "/>
-                    <Hyperlink x:Name="lnkRegister" Click="LnkRegister_Click">
+                <TextBlock HorizontalAlignment="Center"
+                          FontSize="14">
+                    <Run Text="Don't have an account? " Foreground="#666"/>
+                    <Hyperlink x:Name="lnkRegister" 
+                              Click="LnkRegister_Click"
+                              Foreground="#667eea"
+                              TextDecorations="None">
                         <Run Text="Register here"/>
                     </Hyperlink>
                 </TextBlock>
+
+                <!-- Test Accounts Section -->
+                <Border BorderBrush="#ddd"
+                       BorderThickness="0,1,0,0"
+                       Margin="0,30,0,0"
+                       Padding="0,20,0,0">
+                    <StackPanel>
+                        <TextBox Text="Test Accounts (password: password123)"
+                                IsReadOnly="True"
+                                FontSize="14" 
+                                FontWeight="SemiBold"
+                                Foreground="#666"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Margin="0,0,0,10"
+                                Cursor="IBeam"/>
+                        
+                        <StackPanel>
+                            <TextBox Text="admin@library.com - Administrator"
+                                    IsReadOnly="True"
+                                    FontSize="12"
+                                    Foreground="#888"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Margin="0,0,0,5"
+                                    Cursor="IBeam"/>
+                            <TextBox Text="librarian1@library.com - Librarian (Admin)"
+                                    IsReadOnly="True"
+                                    FontSize="12"
+                                    Foreground="#888"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Margin="0,0,0,5"
+                                    Cursor="IBeam"/>
+                            <TextBox Text="librarian2@library.com - Librarian"
+                                    IsReadOnly="True"
+                                    FontSize="12"
+                                    Foreground="#888"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Margin="0,0,0,5"
+                                    Cursor="IBeam"/>
+                            <TextBox Text="john.doe@email.com - Member"
+                                    IsReadOnly="True"
+                                    FontSize="12"
+                                    Foreground="#888"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Margin="0,0,0,5"
+                                    Cursor="IBeam"/>
+                            <TextBox Text="jane.smith@email.com - Member"
+                                    IsReadOnly="True"
+                                    FontSize="12"
+                                    Foreground="#888"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Margin="0,0,0,5"
+                                    Cursor="IBeam"/>
+                            <TextBox Text="bob.wilson@email.com - Member"
+                                    IsReadOnly="True"
+                                    FontSize="12"
+                                    Foreground="#888"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Margin="0,0,0,5"
+                                    Cursor="IBeam"/>
+                            <TextBox Text="alice.brown@email.com - Member (Suspended)"
+                                    IsReadOnly="True"
+                                    FontSize="12"
+                                    Foreground="#888"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Cursor="IBeam"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </Border>
     </Grid>
-    
-    <Page.Resources>
-        <DropShadowEffect x:Key="DropShadowEffect" 
-                         BlurRadius="20" 
-                         ShadowDepth="0" 
-                         Color="Gray" 
-                         Opacity="0.3"/>
-    </Page.Resources>
 </Page>
+

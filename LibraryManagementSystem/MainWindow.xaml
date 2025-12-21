@@ -98,6 +98,17 @@
             </StackPanel>
         </Border>
 
+        <!-- Librarian Navigation Menu -->
+        <Border Grid.Row="1" Background="#34495e" x:Name="librarianNavBar" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="btnNavLibrarianDashboard" 
+                        Content="🏠 Dashboard" 
+                        Style="{StaticResource NavButton}" 
+                        Click="NavLibrarianDashboard_Click"
+                        Tag="Active"/>
+            </StackPanel>
+        </Border>
+
         <!-- Main Content Frame -->
         <Frame x:Name="MainFrame" 
               Grid.Row="2" 

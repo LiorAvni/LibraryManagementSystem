@@ -9,47 +9,45 @@ using LibraryManagementSystem.ViewModel;
 
 namespace LibraryManagementSystem.View.Pages
 {
-    public partial class ManageAuthorsPage : Page
+    public partial class ManageCategoriesPage : Page
     {
-        private readonly BookDB _bookDB;
-        private ObservableCollection<AuthorModel> allAuthors;
-        private ObservableCollection<AuthorModel> filteredAuthors;
+        private readonly CategoryDB _categoryDB;
+        private ObservableCollection<CategoryModel> allCategories;
+        private ObservableCollection<CategoryModel> filteredCategories;
         
         private int currentPage = 0;
         private int pageSize = 20;
         private int totalPages = 0;
         private int totalRecords = 0;
 
-        public ManageAuthorsPage()
+        public ManageCategoriesPage()
         {
             InitializeComponent();
-            _bookDB = new BookDB();
-            allAuthors = new ObservableCollection<AuthorModel>();
-            filteredAuthors = new ObservableCollection<AuthorModel>();
-            dgAuthors.ItemsSource = filteredAuthors;
+            _categoryDB = new CategoryDB();
+            allCategories = new ObservableCollection<CategoryModel>();
+            filteredCategories = new ObservableCollection<CategoryModel>();
+            dgCategories.ItemsSource = filteredCategories;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadAuthors();
+            LoadCategories();
         }
 
-        private void LoadAuthors()
+        private void LoadCategories()
         {
             try
             {
-                DataTable dt = _bookDB.GetAllAuthors();
+                DataTable dt = _categoryDB.GetAllCategories();
                 
-                allAuthors.Clear();
+                allCategories.Clear();
                 foreach (DataRow row in dt.Rows)
                 {
-                    allAuthors.Add(new AuthorModel
+                    allCategories.Add(new CategoryModel
                     {
-                        AuthorId = row["author_id"].ToString(),
-                        FirstName = row["first_name"].ToString(),
-                        LastName = row["last_name"].ToString(),
-                        Biography = row["biography"] != DBNull.Value ? row["biography"].ToString() : "",
-                        BirthDate = row["birth_date"] != DBNull.Value ? Convert.ToDateTime(row["birth_date"]) : (DateTime?)null
+                        CategoryId = row["category_id"].ToString(),
+                        Name = row["name"].ToString(),
+                        Description = row["description"] != DBNull.Value ? row["description"].ToString() : ""
                     });
                 }
 
@@ -57,7 +55,7 @@ namespace LibraryManagementSystem.View.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading authors: {ex.Message}", "Error", 
+                MessageBox.Show($"Error loading categories: {ex.Message}", "Error", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -66,15 +64,13 @@ namespace LibraryManagementSystem.View.Pages
         {
             var searchText = txtSearchName.Text?.Trim().ToLower() ?? "";
 
-            // Filter authors
-            var filtered = allAuthors.Where(author =>
+            // Filter categories
+            var filtered = allCategories.Where(category =>
             {
                 if (string.IsNullOrEmpty(searchText))
                     return true;
 
-                return author.FirstName.ToLower().Contains(searchText) ||
-                       author.LastName.ToLower().Contains(searchText) ||
-                       author.FullName.ToLower().Contains(searchText);
+                return category.Name.ToLower().Contains(searchText);
             }).ToList();
 
             // Update total records and pages
@@ -87,12 +83,12 @@ namespace LibraryManagementSystem.View.Pages
                 currentPage = 0;
             }
 
-            // Get authors for current page
-            filteredAuthors.Clear();
-            var pagedAuthors = filtered.Skip(currentPage * pageSize).Take(pageSize);
-            foreach (var author in pagedAuthors)
+            // Get categories for current page
+            filteredCategories.Clear();
+            var pagedCategories = filtered.Skip(currentPage * pageSize).Take(pageSize);
+            foreach (var category in pagedCategories)
             {
-                filteredAuthors.Add(author);
+                filteredCategories.Add(category);
             }
 
             // Update UI
@@ -124,7 +120,7 @@ namespace LibraryManagementSystem.View.Pages
 
         private void UpdateFilterInfo()
         {
-            string infoText = $"{totalRecords} author(s) found";
+            string infoText = $"{totalRecords} category(ies) found";
             if (totalPages > 1)
             {
                 infoText += $" | Page {currentPage + 1} of {totalPages}";
@@ -186,35 +182,35 @@ namespace LibraryManagementSystem.View.Pages
         }
 
         // Action handlers
-        private void AddAuthor_Click(object sender, RoutedEventArgs e)
+        private void AddCategory_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService?.Navigate(new AddAuthorPage());
+            NavigationService?.Navigate(new AddCategoryPage());
         }
 
-        private void EditAuthor_Click(object sender, RoutedEventArgs e)
+        private void EditCategory_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.Tag is AuthorModel author)
+            if (sender is Button button && button.Tag is CategoryModel category)
             {
-                NavigationService?.Navigate(new EditAuthorPage(author.AuthorId));
+                NavigationService?.Navigate(new EditCategoryPage(category.CategoryId));
             }
         }
 
-        private void DeleteAuthor_Click(object sender, RoutedEventArgs e)
+        private void DeleteCategory_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.Tag is AuthorModel author)
+            if (sender is Button button && button.Tag is CategoryModel category)
             {
-                // Check if author has books
+                // Check if category has books
                 try
                 {
-                    int bookCount = _bookDB.GetAuthorBookCount(author.AuthorId);
+                    int bookCount = _categoryDB.GetCategoryBookCount(category.CategoryId);
                     
                     if (bookCount > 0)
                     {
                         MessageBox.Show(
-                            $"Cannot delete this author.\n\n" +
-                            $"{author.FullName} is currently listed as an author of {bookCount} book(s) in the library.\n\n" +
-                            "Please remove the author from all books before deleting.",
-                            "Cannot Delete Author",
+                            $"Cannot delete this category.\n\n" +
+                            $"{category.Name} is currently assigned to {bookCount} book(s) in the library.\n\n" +
+                            "Please reassign or remove all books from this category before deleting.",
+                            "Cannot Delete Category",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);
                         return;
@@ -222,8 +218,8 @@ namespace LibraryManagementSystem.View.Pages
 
                     // Confirm deletion
                     var result = MessageBox.Show(
-                        $"Are you sure you want to delete this author?\n\n" +
-                        $"Name: {author.FullName}\n\n" +
+                        $"Are you sure you want to delete this category?\n\n" +
+                        $"Name: {category.Name}\n\n" +
                         "This action cannot be undone.",
                         "Confirm Delete",
                         MessageBoxButton.YesNo,
@@ -231,22 +227,22 @@ namespace LibraryManagementSystem.View.Pages
 
                     if (result == MessageBoxResult.Yes)
                     {
-                        bool success = _bookDB.DeleteAuthor(author.AuthorId);
+                        bool success = _categoryDB.DeleteCategory(category.CategoryId);
                         
                         if (success)
                         {
                             MessageBox.Show(
-                                $"Author '{author.FullName}' has been deleted successfully.",
+                                $"Category '{category.Name}' has been deleted successfully.",
                                 "Success",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Information);
                             
-                            LoadAuthors(); // Reload the list
+                            LoadCategories(); // Reload the list
                         }
                         else
                         {
                             MessageBox.Show(
-                                "Failed to delete author. Please try again.",
+                                "Failed to delete category. Please try again.",
                                 "Error",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
@@ -255,7 +251,7 @@ namespace LibraryManagementSystem.View.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting author: {ex.Message}", "Error", 
+                    MessageBox.Show($"Error deleting category: {ex.Message}", "Error", 
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -263,38 +259,24 @@ namespace LibraryManagementSystem.View.Pages
     }
 
     /// <summary>
-    /// Model for displaying author information
+    /// Model for displaying category information
     /// </summary>
-    public class AuthorModel
+    public class CategoryModel
     {
-        public string AuthorId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Biography { get; set; }
-        public DateTime? BirthDate { get; set; }
+        public string CategoryId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
 
-        public string FullName => $"{FirstName} {LastName}";
-
-        public string BiographyPreview
+        public string DescriptionPreview
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(Biography))
+                if (string.IsNullOrWhiteSpace(Description))
                     return "N/A";
                 
-                return Biography.Length > 100 
-                    ? Biography.Substring(0, 100) + "..." 
-                    : Biography;
-            }
-        }
-
-        public string BirthDateFormatted
-        {
-            get
-            {
-                if (BirthDate.HasValue)
-                    return BirthDate.Value.ToString("MMM dd, yyyy");
-                return "N/A";
+                return Description.Length > 100 
+                    ? Description.Substring(0, 100) + "..." 
+                    : Description;
             }
         }
     }

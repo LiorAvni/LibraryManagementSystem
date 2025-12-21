@@ -38,30 +38,24 @@ namespace LibraryManagementSystem.View.Pages
             LoadBooks();
         }
 
-        // Navigation handler
-        private void NavDashboard_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService?.Navigate(new LibrarianDashboard());
-        }
-
         private void LoadCategories()
         {
             try
             {
                 // Get all categories from database
-                var categories = _categoryDB.GetAllCategories();
+                DataTable categories = _categoryDB.GetAllCategories();
                 
                 // Clear existing items (keep "All Categories")
                 cmbCategory.Items.Clear();
                 cmbCategory.Items.Add(new ComboBoxItem { Content = "All Categories", Tag = "", IsSelected = true });
                 
                 // Add categories
-                foreach (var category in categories)
+                foreach (DataRow row in categories.Rows)
                 {
                     cmbCategory.Items.Add(new ComboBoxItem 
                     { 
-                        Content = category.Name, 
-                        Tag = category.Name 
+                        Content = row["name"].ToString(), 
+                        Tag = row["name"].ToString() 
                     });
                 }
             }

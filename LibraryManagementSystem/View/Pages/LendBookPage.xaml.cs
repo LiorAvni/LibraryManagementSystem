@@ -195,6 +195,21 @@ namespace LibraryManagementSystem.View.Pages
                 {
                     try
                     {
+                        // ? CHECK IF MEMBER IS SUSPENDED
+                        string memberStatus = _memberDB.GetMemberStatusByUserId(member.UserId);
+                        if (!string.IsNullOrEmpty(memberStatus) && memberStatus.Equals("SUSPENDED", StringComparison.OrdinalIgnoreCase))
+                        {
+                            MessageBox.Show(
+                                $"Cannot lend book to {member.FirstName} {member.LastName}.{Environment.NewLine}{Environment.NewLine}" +
+                                "This member's account is currently SUSPENDED.{Environment.NewLine}" +
+                                "Members with suspended accounts cannot borrow books.{Environment.NewLine}{Environment.NewLine}" +
+                                "Please contact an administrator to reactivate the account.",
+                                "Member Account Suspended",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                            return;
+                        }
+
                         // Check if member has reached max loans
                         string maxLoansStr = _loanDB.GetLibrarySetting("MAX_BOOKS_PER_MEMBER");
                         int maxLoans = 3; // Default

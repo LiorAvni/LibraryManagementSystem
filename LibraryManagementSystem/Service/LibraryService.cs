@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -551,12 +552,35 @@ namespace LibraryManagementSystem.Service
 
         public CategoriesList GetAllCategories()
         {
-            return _categoryDB.GetAllCategories();
+            try
+            {
+                DataTable dt = _categoryDB.GetAllCategories();
+                CategoriesList categories = new CategoriesList();
+                
+                foreach (DataRow row in dt.Rows)
+                {
+                    categories.Add(new Category
+                    {
+                        CategoryID = 0, // Not used in actual DB
+                        Name = row["name"]?.ToString() ?? "",
+                        Description = row["description"] != DBNull.Value ? row["description"]?.ToString() : "",
+                        ParentCategoryID = null,
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+                }
+                
+                return categories;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get categories: {ex.Message}", ex);
+            }
         }
 
         public bool AddCategory(Category category)
         {
-            return _categoryDB.InsertCategory(category);
+            return _categoryDB.InsertCategory(category.Name, category.Description ?? "");
         }
 
         // ========== HELPER METHODS ==========

@@ -108,29 +108,15 @@ namespace LibraryManagementSystem.ViewModel
     // Category DB Operations
     public class CategoryDB : BaseDB
     {
-        public CategoriesList GetAllCategories()
+        /// <summary>
+        /// Gets all categories from the database
+        /// </summary>
+        public DataTable GetAllCategories()
         {
             try
             {
-                // Query actual database structure (no IsActive field)
                 string query = "SELECT category_id, name, description FROM categories ORDER BY name";
-                DataTable dt = ExecuteQuery(query);
-                CategoriesList categories = new CategoriesList();
-                
-                foreach (DataRow row in dt.Rows)
-                {
-                    categories.Add(new Category
-                    {
-                        CategoryID = 0, // Not used, will use Name instead
-                        Name = row["name"]?.ToString(),
-                        Description = row["description"]?.ToString(),
-                        ParentCategoryID = null,
-                        CreatedAt = DateTime.Now,
-                        IsActive = true
-                    });
-                }
-                
-                return categories;
+                return ExecuteQuery(query);
             }
             catch (Exception ex)
             {
@@ -138,7 +124,32 @@ namespace LibraryManagementSystem.ViewModel
             }
         }
 
-        public bool InsertCategory(Category category)
+        /// <summary>
+        /// Gets a single category by ID
+        /// </summary>
+        public DataRow GetCategoryById(string categoryId)
+        {
+            try
+            {
+                string query = "SELECT category_id, name, description FROM categories WHERE category_id = ?";
+                DataTable dt = ExecuteQuery(query, 
+                    new OleDbParameter("@CategoryID", OleDbType.VarChar, 36) { Value = categoryId });
+                
+                if (dt.Rows.Count > 0)
+                    return dt.Rows[0];
+                
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get category: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Inserts a new category
+        /// </summary>
+        public bool InsertCategory(string name, string description)
         {
             try
             {
@@ -148,8 +159,8 @@ namespace LibraryManagementSystem.ViewModel
                 string query = "INSERT INTO categories (category_id, name, description) VALUES (?, ?, ?)";
                 return ExecuteNonQuery(query,
                     new OleDbParameter("@CategoryID", OleDbType.VarChar, 36) { Value = categoryId },
-                    new OleDbParameter("@Name", category.Name ?? (object)DBNull.Value),
-                    new OleDbParameter("@Description", category.Description ?? (object)DBNull.Value)
+                    new OleDbParameter("@Name", OleDbType.VarChar, 50) { Value = name ?? (object)DBNull.Value },
+                    new OleDbParameter("@Description", OleDbType.LongVarChar) { Value = description ?? (object)DBNull.Value }
                 ) > 0;
             }
             catch (Exception ex)
@@ -157,14 +168,98 @@ namespace LibraryManagementSystem.ViewModel
                 throw new Exception($"Failed to insert category: {ex.Message}", ex);
             }
         }
-        
+
         /// <summary>
-        /// Generates a new category ID as a UUID/GUID
+        /// Updates an existing category
         /// </summary>
-        /// <returns>New UUID string</returns>
-        private string GenerateNextCategoryId()
+        public bool UpdateCategory(string categoryId, string name, string description)
         {
-            return Guid.NewGuid().ToString();
+            try
+            {
+                string query = "UPDATE categories SET name = ?, description = ? WHERE category_id = ?";
+                return ExecuteNonQuery(query,
+                    new OleDbParameter("@Name", OleDbType.VarChar, 50) { Value = name ?? (object)DBNull.Value },
+                    new OleDbParameter("@Description", OleDbType.LongVarChar) { Value = description ?? (object)DBNull.Value },
+                    new OleDbParameter("@CategoryID", OleDbType.VarChar, 36) { Value = categoryId }
+                ) > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to update category: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deletes a category
+        /// </summary>
+        public bool DeleteCategory(string categoryId)
+        {
+            try
+            {
+                string query = "DELETE FROM categories WHERE category_id = ?";
+                return ExecuteNonQuery(query,
+                    new OleDbParameter("@CategoryID", OleDbType.VarChar, 36) { Value = categoryId }
+                ) > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to delete category: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the count of books in a specific category
+        /// </summary>
+        public int GetCategoryBookCount(string categoryId)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM books WHERE category_id = ?";
+                DataTable dt = ExecuteQuery(query, 
+                    new OleDbParameter("@CategoryID", OleDbType.VarChar, 36) { Value = categoryId });
+                
+                if (dt.Rows.Count > 0)
+                    return Convert.ToInt32(dt.Rows[0][0]);
+                
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get category book count: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks if a category name already exists (for validation)
+        /// </summary>
+        public bool CategoryNameExists(string name, string excludeCategoryId = null)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM categories WHERE LOWER(name) = ?";
+                var parameters = new OleDbParameter[] { new OleDbParameter("@Name", name.ToLower()) };
+                
+                if (!string.IsNullOrEmpty(excludeCategoryId))
+                {
+                    query += " AND category_id <> ?";
+                    parameters = new OleDbParameter[] 
+                    { 
+                        new OleDbParameter("@Name", name.ToLower()),
+                        new OleDbParameter("@CategoryID", excludeCategoryId)
+                    };
+                }
+                
+                DataTable dt = ExecuteQuery(query, parameters);
+                
+                if (dt.Rows.Count > 0)
+                    return Convert.ToInt32(dt.Rows[0][0]) > 0;
+                
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to check category name: {ex.Message}", ex);
+            }
         }
     }
 }

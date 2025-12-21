@@ -89,6 +89,7 @@ namespace LibraryManagementSystem.View.Pages
         private readonly LibraryService _libraryService;
         private readonly LoanDB _loanDB;
         private readonly ReservationDB _reservationDB;
+        private readonly MemberDB _memberDB;
         private ObservableCollection<LoanDisplayModel> currentLoans;
         private ObservableCollection<ReservationDisplayModel> reservations;
         private ObservableCollection<LoanDisplayModel> loanHistory;
@@ -102,6 +103,7 @@ namespace LibraryManagementSystem.View.Pages
             _libraryService = new LibraryService();
             _loanDB = new LoanDB();
             _reservationDB = new ReservationDB();
+            _memberDB = new MemberDB();
             
             currentLoans = new ObservableCollection<LoanDisplayModel>();
             reservations = new ObservableCollection<ReservationDisplayModel>();
@@ -130,7 +132,9 @@ namespace LibraryManagementSystem.View.Pages
                 // Set user info
                 txtMemberName.Text = $"{currentUser.FirstName} {currentUser.LastName}";
                 txtMemberId.Text = currentUser.UserIdString ?? currentUser.UserID.ToString();
-                txtStatus.Text = currentUser.IsActive ? "ACTIVE" : "INACTIVE";
+                
+                // ? GET MEMBERSHIP STATUS FROM DATABASE
+                LoadMembershipStatus();
                 
                 // Load real data from database
                 LoadCurrentLoans();
@@ -141,6 +145,64 @@ namespace LibraryManagementSystem.View.Pages
                 
                 UpdateStatistics();
                 UpdateHistoryStatistics(); // Update loan history statistics
+            }
+        }
+
+        private void LoadMembershipStatus()
+        {
+            try
+            {
+                var currentUser = MainWindow.CurrentUser;
+                if (currentUser == null || string.IsNullOrEmpty(currentUser.UserIdString))
+                {
+                    // Fallback to basic user active status
+                    txtStatus.Text = currentUser?.IsActive == true ? "ACTIVE" : "INACTIVE";
+                    UpdateStatusBadge("ACTIVE");
+                    return;
+                }
+
+                // Get membership status from database
+                string membershipStatus = _memberDB.GetMemberStatusByUserId(currentUser.UserIdString);
+                
+                if (!string.IsNullOrEmpty(membershipStatus))
+                {
+                    txtStatus.Text = membershipStatus.ToUpper();
+                    UpdateStatusBadge(membershipStatus.ToUpper());
+                }
+                else
+                {
+                    // Member not found, fallback
+                    txtStatus.Text = "UNKNOWN";
+                    UpdateStatusBadge("UNKNOWN");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Error fetching status, show error state
+                txtStatus.Text = "ERROR";
+                UpdateStatusBadge("ERROR");
+            }
+        }
+
+        private void UpdateStatusBadge(string status)
+        {
+            // Update badge styling based on status
+            if (status == "ACTIVE")
+            {
+                statusBadge.Style = (Style)FindResource("BadgeActive");
+                txtStatus.Style = (Style)FindResource("BadgeActiveText");
+            }
+            else if (status == "SUSPENDED")
+            {
+                // Use overdue style for suspended (red)
+                statusBadge.Style = (Style)FindResource("BadgeOverdue");
+                txtStatus.Style = (Style)FindResource("BadgeOverdueText");
+            }
+            else
+            {
+                // Use warning style for unknown/error (yellow)
+                statusBadge.Style = (Style)FindResource("BadgeWarning");
+                txtStatus.Style = (Style)FindResource("BadgeWarningText");
             }
         }
 

@@ -1,11 +1,15 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using LibraryManagementSystem.ViewModel;
 
 namespace LibraryManagementSystem.View.Pages
 {
     public partial class LibrarianDashboard : Page
     {
+        private bool isAdmin = false;
+
         public LibrarianDashboard()
         {
             InitializeComponent();
@@ -24,6 +28,39 @@ namespace LibraryManagementSystem.View.Pages
                 txtLibrarianName.Text = $"{currentUser.FirstName} {currentUser.LastName}";
                 // TODO: Get actual employee ID from librarian record
                 txtEmployeeId.Text = "EMP" + currentUser.UserID.ToString("D3");
+                
+                // Check if user is admin
+                CheckAdminStatus(currentUser.UserIdString);
+            }
+        }
+
+        private void CheckAdminStatus(string userId)
+        {
+            try
+            {
+                var memberDB = new MemberDB();
+                isAdmin = memberDB.IsUserAdmin(userId);
+                
+                // Update UI based on admin status
+                if (isAdmin)
+                {
+                    // Admin sees "Manage Users" instead of "Manage Members"
+                    txtManageUsersTitle.Text = "Manage Users";
+                    txtManageUsersDesc.Text = "View and manage members, librarians & admins";
+                    btnManageUsers.Content = "Go to Users";
+                }
+                else
+                {
+                    // Regular librarian sees "Manage Members"
+                    txtManageUsersTitle.Text = "Manage Members";
+                    txtManageUsersDesc.Text = "View and manage members";
+                    btnManageUsers.Content = "Go to Members";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error checking admin status: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -45,14 +82,12 @@ namespace LibraryManagementSystem.View.Pages
 
         private void ManageLoans_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Navigate to Manage Loans page
-            MessageBox.Show("Navigate to Manage Loans page", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            NavigationService?.Navigate(new ManageLoansPage());
         }
 
         private void ManageReservations_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Navigate to Manage Reservations page
-            MessageBox.Show("Navigate to Manage Reservations page", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            NavigationService?.Navigate(new ManageReservationsPage());
         }
 
         private void SearchBooks_Click(object sender, RoutedEventArgs e)
@@ -74,8 +109,13 @@ namespace LibraryManagementSystem.View.Pages
 
         private void ManageCategories_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Navigate to Manage Categories page
-            MessageBox.Show("Navigate to Manage Categories page", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            NavigationService?.Navigate(new ManageCategoriesPage());
+        }
+
+        private void ManagePublishers_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Navigate to Manage Publishers page
+            MessageBox.Show("Navigate to Manage Publishers page", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void NavigateToSearch(object sender, MouseButtonEventArgs e)

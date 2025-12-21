@@ -11,6 +11,181 @@ namespace LibraryManagementSystem.ViewModel
     public class ReservationDB : BaseDB
     {
         /// <summary>
+        /// Gets all reservations for management (librarian view)
+        /// </summary>
+        /// <returns>DataTable with all reservations</returns>
+        public DataTable GetAllReservationsForManagement()
+        {
+            try
+            {
+                string query = @"
+                    SELECT 
+                        r.reservation_id,
+                        r.book_id,
+                        b.title AS BookTitle,
+                        u.first_name & ' ' & u.last_name AS MemberName,
+                        r.reservation_date,
+                        r.expiry_date,
+                        r.reservation_status
+                    FROM ((reservations r
+                    INNER JOIN books b ON r.book_id = b.book_id)
+                    INNER JOIN members m ON r.member_id = m.member_id)
+                    INNER JOIN users u ON m.user_id = u.user_id
+                    WHERE r.reservation_status IN ('PENDING', 'RESERVED', 'CANCELLED', 'FULFILLED', 'EXPIRED')
+                    ORDER BY r.reservation_date DESC";
+                
+                return ExecuteQuery(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get reservations for management: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Approves a reservation by assigning a copy and changing status
+        /// </summary>
+        /// <param name="reservationId">Reservation ID (GUID string)</param>
+        /// <param name="bookId">Book ID to find available copy</param>
+        /// <returns>True if successful</returns>
+        public bool ApproveReservation(string reservationId, string bookId)
+        {
+            try
+            {
+                // STEP 1: Find an available copy for this book
+                string findCopyQuery = "SELECT TOP 1 copy_id FROM book_copies WHERE book_id = ? AND status = 'AVAILABLE' ORDER BY copy_number";
+                
+                OleDbParameter findCopyParam = new OleDbParameter("?", OleDbType.VarChar, 36) { Value = bookId };
+                object copyIdObj = ExecuteScalar(findCopyQuery, findCopyParam);
+                
+                if (copyIdObj == null)
+                {
+                    throw new Exception("No available copies found for this book.");
+                }
+                
+                string copyId = copyIdObj.ToString();
+                
+                // STEP 2: Update ONLY the reservation status (simplified - no book_copy_id)
+                string updateReservationQuery = "UPDATE reservations SET reservation_status = ? WHERE reservation_id = ?";
+                
+                OleDbParameter[] reservationParams = {
+                    new OleDbParameter("?", OleDbType.VarChar, 20) { Value = "RESERVED" },
+                    new OleDbParameter("?", OleDbType.VarChar, 36) { Value = reservationId }
+                };
+                
+                int reservationResult = ExecuteNonQuery(updateReservationQuery, reservationParams);
+                
+                if (reservationResult > 0)
+                {
+                    // STEP 3: Update copy status to RESERVED
+                    string updateCopyQuery = "UPDATE book_copies SET status = ? WHERE copy_id = ?";
+                    OleDbParameter[] updateCopyParams = {
+                        new OleDbParameter("?", OleDbType.VarChar, 20) { Value = "RESERVED" },
+                        new OleDbParameter("?", OleDbType.VarChar, 36) { Value = copyId }
+                    };
+                    ExecuteNonQuery(updateCopyQuery, updateCopyParams);
+                    
+                    return true;
+                }
+                
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to approve reservation: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Cancels a reservation by librarian (releases copy back to AVAILABLE)
+        /// </summary>
+        /// <param name="reservationId">Reservation ID (GUID string)</param>
+        /// <returns>True if successful</returns>
+        public bool CancelReservationByLibrarian(string reservationId)
+        {
+            try
+            {
+                // Get the copy_id from reservation (if any)
+                string getCopyQuery = "SELECT book_copy_id FROM reservations WHERE reservation_id = ?";
+                OleDbParameter getCopyParam = new OleDbParameter("@ReservationID", OleDbType.VarChar, 36) { Value = reservationId };
+                object copyIdObj = ExecuteScalar(getCopyQuery, getCopyParam);
+                
+                // Update reservation status to CANCELLED
+                string updateReservationQuery = @"
+                    UPDATE reservations 
+                    SET reservation_status = ?
+                    WHERE reservation_id = ?";
+                
+                OleDbParameter[] updateParams = {
+                    new OleDbParameter("@Status", OleDbType.VarChar, 20) { Value = "CANCELLED" },
+                    new OleDbParameter("@ReservationID", OleDbType.VarChar, 36) { Value = reservationId }
+                };
+                int result = ExecuteNonQuery(updateReservationQuery, updateParams);
+                
+                // If there was a copy assigned, release it back to AVAILABLE
+                if (copyIdObj != null && copyIdObj != DBNull.Value)
+                {
+                    string copyId = copyIdObj.ToString();
+                    string updateCopyQuery = "UPDATE book_copies SET status = ? WHERE copy_id = ?";
+                    OleDbParameter[] updateCopyParams = {
+                        new OleDbParameter("@Status", OleDbType.VarChar, 20) { Value = "AVAILABLE" },
+                        new OleDbParameter("@CopyID", OleDbType.VarChar, 36) { Value = copyId }
+                    };
+                    ExecuteNonQuery(updateCopyQuery, updateCopyParams);
+                }
+                
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to cancel reservation: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Dis-approves a reservation (changes status from RESERVED back to PENDING and releases copy)
+        /// </summary>
+        /// <param name="reservationId">Reservation ID (GUID string)</param>
+        /// <returns>True if successful</returns>
+        public bool DisApproveReservation(string reservationId)
+        {
+            try
+            {
+                // STEP 1: Get the copy_id from reservation BEFORE updating
+                string getCopyQuery = "SELECT book_copy_id FROM reservations WHERE reservation_id = ?";
+                OleDbParameter getCopyParam = new OleDbParameter("?", OleDbType.VarChar, 36) { Value = reservationId };
+                object copyIdObj = ExecuteScalar(getCopyQuery, getCopyParam);
+                
+                // STEP 2: Update reservation status to PENDING (simplified - just change status)
+                string updateReservationQuery = "UPDATE reservations SET reservation_status = ? WHERE reservation_id = ?";
+                
+                OleDbParameter[] updateParams = {
+                    new OleDbParameter("?", OleDbType.VarChar, 20) { Value = "PENDING" },
+                    new OleDbParameter("?", OleDbType.VarChar, 36) { Value = reservationId }
+                };
+                int result = ExecuteNonQuery(updateReservationQuery, updateParams);
+                
+                // STEP 3: If there was a copy assigned, release it back to AVAILABLE
+                if (copyIdObj != null && copyIdObj != DBNull.Value)
+                {
+                    string copyId = copyIdObj.ToString();
+                    string updateCopyQuery = "UPDATE book_copies SET status = ? WHERE copy_id = ?";
+                    OleDbParameter[] updateCopyParams = {
+                        new OleDbParameter("?", OleDbType.VarChar, 20) { Value = "AVAILABLE" },
+                        new OleDbParameter("?", OleDbType.VarChar, 36) { Value = copyId }
+                    };
+                    ExecuteNonQuery(updateCopyQuery, updateCopyParams);
+                }
+                
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to dis-approve reservation: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Gets all reservations for a specific member with book details
         /// </summary>
         /// <param name="userId">User ID (from users table)</param>
@@ -32,7 +207,7 @@ namespace LibraryManagementSystem.ViewModel
                     INNER JOIN members m ON r.member_id = m.member_id)
                     INNER JOIN books b ON r.book_id = b.book_id
                     WHERE m.user_id = ? 
-                    AND r.reservation_status IN ('PENDING', 'READY')
+                    AND r.reservation_status IN ('PENDING', 'RESERVED')
                     ORDER BY r.reservation_date DESC";
                 
                 OleDbParameter param = new OleDbParameter("@UserID", OleDbType.VarChar, 36) { Value = userId };
@@ -351,7 +526,7 @@ namespace LibraryManagementSystem.ViewModel
         /// Gets active reservation count for a member
         /// </summary>
         /// <param name="memberId">Member ID (GUID string)</param>
-        /// <returns>Number of active reservations (PENDING or READY)</returns>
+        /// <returns>Number of active reservations (PENDING or RESERVED)</returns>
         public int GetActiveReservationCount(string memberId)
         {
             try
@@ -360,7 +535,7 @@ namespace LibraryManagementSystem.ViewModel
                     SELECT COUNT(*) 
                     FROM reservations 
                     WHERE member_id = ? 
-                    AND reservation_status IN ('PENDING', 'READY')";
+                    AND reservation_status IN ('PENDING', 'RESERVED')";
                 
                 OleDbParameter param = new OleDbParameter("@MemberID", OleDbType.VarChar, 36) { Value = memberId };
                 object result = ExecuteScalar(query, param);
@@ -392,17 +567,25 @@ namespace LibraryManagementSystem.ViewModel
         {
             try
             {
-                // Get member_id from user_id
-                string memberQuery = "SELECT member_id FROM members WHERE user_id = ?";
+                // Get member_id and membership_status from user_id
+                string memberQuery = "SELECT member_id, membership_status FROM members WHERE user_id = ?";
                 OleDbParameter memberParam = new OleDbParameter("@UserID", OleDbType.VarChar, 36) { Value = userId };
-                object memberIdObj = ExecuteScalar(memberQuery, memberParam);
+                DataTable memberDt = ExecuteQuery(memberQuery, memberParam);
                 
-                if (memberIdObj == null)
+                if (memberDt.Rows.Count == 0)
                 {
                     throw new Exception("Member not found for this user.");
                 }
                 
-                string memberId = memberIdObj.ToString();
+                DataRow memberRow = memberDt.Rows[0];
+                string memberId = memberRow["member_id"].ToString();
+                string membershipStatus = memberRow["membership_status"]?.ToString() ?? "ACTIVE";
+                
+                // ? CHECK IF MEMBER IS SUSPENDED
+                if (membershipStatus.Equals("SUSPENDED", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Exception("Your account is currently SUSPENDED. You cannot make new reservations at this time.\n\nPlease contact the library administration for more information.");
+                }
                 
                 // Check MAX_RESERVATIONS_PER_MEMBER from library_settings
                 string maxReservationsQuery = "SELECT setting_value FROM library_settings WHERE setting_key = 'MAX_RESERVATIONS_PER_MEMBER'";
@@ -425,7 +608,7 @@ namespace LibraryManagementSystem.ViewModel
                     SELECT COUNT(*) 
                     FROM reservations 
                     WHERE book_id = ? AND member_id = ? 
-                    AND reservation_status IN ('PENDING', 'READY')";
+                    AND reservation_status IN ('PENDING', 'RESERVED')";
                 
                 OleDbParameter[] checkParams = {
                     new OleDbParameter("@BookID", OleDbType.VarChar, 36) { Value = bookId },

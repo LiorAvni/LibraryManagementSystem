@@ -1,0 +1,421 @@
+# ?? LIBRARIAN DASHBOARD - UPDATED STRUCTURE
+
+## ?? Overview
+
+The Librarian Dashboard has been **reorganized** with a new layout and role-based access control:
+- **Regular Librarian:** Manages members only
+- **Admin Librarian:** Manages all users (members, librarians, admins)
+
+---
+
+## ? What Changed
+
+### **Layout Changes:**
+1. **Grid Layout:** Changed from 3ª3 to **3ª4** (10 cards total)
+2. **Card Reordering:** Moved Search Books to top-left position
+3. **New Card:** Added **Publishers** card
+4. **Dynamic Card:** Third card changes based on admin status
+
+### **New Features:**
+1. **Role Detection:** Checks `user_roles` table for ADMIN role
+2. **Dynamic UI:** Card title, description, and button text change for admins
+3. **Publishers Management:** New card added (TODO implementation)
+
+---
+
+## ?? Updated Visual Layout
+
+### **Regular Librarian:**
+```
+???????????????????????????????????????????????????????????????????????
+?  Welcome, [Librarian Name]!                                         ?
+?  Employee ID: [EMP###]                                              ?
+???????????????????????????????????????????????????????????????????????
+
+???????????????????????????????????????????????????????
+?  ?? Search Books ?  ?? Manage Books ?  ?? Manage      ?
+?                  ?                  ?     Members     ?
+?  Search the      ?  Add, edit, or   ?                 ?
+?  library         ?  remove books    ?  View and       ?
+?  catalog         ?  from library    ?  manage members ?
+?                  ?                  ?                 ?
+?  [Search]        ?  [Go to Books]   ?  [Go to Members]?
+???????????????????????????????????????????????????????
+
+?????????????????????????????????????
+?  ?? Manage Loans ?  ?? Reservations ?
+?                  ?                  ?
+?  Process book    ?  View and manage ?
+?  loans and       ?  book            ?
+?  returns         ?  reservations    ?
+?                  ?                  ?
+?  [Go to Loans]   ?[Go to Reservations]?
+?????????????????????????????????????
+
+???????????????????????????????????????????????????????
+?  ?? Manage       ?  ??? Categories  ?  ????? Publishers ?
+?     Authors      ?                  ?                 ?
+?                  ?  Manage book     ?  Manage         ?
+?  Add, edit, or   ?  categories      ?  publishers     ?
+?  remove authors  ?                  ?                 ?
+?                  ?                  ?                 ?
+?  [Go to Authors] ?[Go to Categories]?[Go to Publishers]?
+???????????????????????????????????????????????????????
+
+?????????????????????????????????????
+?  ?? Reports      ?  ?? Settings     ?
+?                  ?                  ?
+?  View library    ?  Configure       ?
+?  statistics and  ?  library         ?
+?  reports         ?  settings        ?
+?                  ?                  ?
+?  [View Reports]  ?  [Go to Settings]?
+?????????????????????????????????????
+```
+
+### **Admin Librarian:**
+```
+???????????????????????????????????????????????????????????????????????
+?  Welcome, [Librarian Name]!                                         ?
+?  Employee ID: [EMP###]                                              ?
+???????????????????????????????????????????????????????????????????????
+
+???????????????????????????????????????????????????????
+?  ?? Search Books ?  ?? Manage Books ?  ?? Manage Users?
+?                  ?                  ?                 ?
+?  Search the      ?  Add, edit, or   ?  View and       ?
+?  library         ?  remove books    ?  manage members ?
+?  catalog         ?  from library    ?  & librarians   ?
+?                  ?                  ?  & admins       ?
+?  [Search]        ?  [Go to Books]   ?  [Go to Users]  ?
+???????????????????????????????????????????????????????
+
+?????????????????????????????????????
+?  ?? Manage Loans ?  ?? Reservations ?
+?                  ?                  ?
+?  Process book    ?  View and manage ?
+?  loans and       ?  book            ?
+?  returns         ?  reservations    ?
+?                  ?                  ?
+?  [Go to Loans]   ?[Go to Reservations]?
+?????????????????????????????????????
+
+???????????????????????????????????????????????????????
+?  ?? Manage       ?  ??? Categories  ?  ????? Publishers ?
+?     Authors      ?                  ?                 ?
+?                  ?  Manage book     ?  Manage         ?
+?  Add, edit, or   ?  categories      ?  publishers     ?
+?  remove authors  ?                  ?                 ?
+?                  ?                  ?                 ?
+?  [Go to Authors] ?[Go to Categories]?[Go to Publishers]?
+???????????????????????????????????????????????????????
+
+?????????????????????????????????????
+?  ?? Reports      ?  ?? Settings     ?
+?                  ?                  ?
+?  View library    ?  Configure       ?
+?  statistics and  ?  library         ?
+?  reports         ?  settings        ?
+?                  ?                  ?
+?  [View Reports]  ?  [Go to Settings]?
+?????????????????????????????????????
+```
+
+---
+
+## ?? Role-Based Access Control
+
+### **Admin Detection:**
+```csharp
+private void CheckAdminStatus(string userId)
+{
+    try
+    {
+        var memberDB = new MemberDB();
+        isAdmin = memberDB.IsUserAdmin(userId);
+        
+        // Update UI based on admin status
+        if (isAdmin)
+        {
+            // Admin sees "Manage Users" instead of "Manage Members"
+            txtManageUsersTitle.Text = "Manage Users";
+            txtManageUsersDesc.Text = "View and manage members, librarians & admins";
+            btnManageUsers.Content = "Go to Users";
+        }
+        else
+        {
+            // Regular librarian sees "Manage Members"
+            txtManageUsersTitle.Text = "Manage Members";
+            txtManageUsersDesc.Text = "View and manage members";
+            btnManageUsers.Content = "Go to Members";
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Error checking admin status: {ex.Message}", "Error",
+            MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+```
+
+### **Database Query:**
+```sql
+SELECT COUNT(*) 
+FROM user_roles 
+WHERE user_id = ? AND role = 'ADMIN'
+```
+
+**Returns:**
+- `> 0` ? User is admin
+- `= 0` ? User is regular librarian
+
+---
+
+## ?? Card Details
+
+### **Row 1: Primary Functions**
+
+| Card # | Icon | Title | Description | Button | Navigation | Status |
+|--------|------|-------|-------------|--------|------------|--------|
+| 1 | ?? | Search Books | Search the library catalog | Search | `SearchBooksPage` | ? Implemented |
+| 2 | ?? | Manage Books | Add, edit, or remove books | Go to Books | `ManageBooksPage` | ? Implemented |
+| 3 | ?? | Manage Members/Users | (Dynamic based on role) | Go to Members/Users | `ManageMembersPage` | ? Implemented |
+
+### **Row 2: Operations**
+
+| Card # | Icon | Title | Description | Button | Navigation | Status |
+|--------|------|-------|-------------|--------|------------|--------|
+| 4 | ?? | Manage Loans | Process book loans and returns | Go to Loans | `ManageLoansPage` | ? Implemented |
+| 5 | ?? | Reservations | View and manage reservations | Go to Reservations | `ManageReservationsPage` | ? Implemented |
+
+### **Row 3: Data Management**
+
+| Card # | Icon | Title | Description | Button | Navigation | Status |
+|--------|------|-------|-------------|--------|------------|--------|
+| 6 | ?? | Manage Authors | Add, edit, or remove authors | Go to Authors | `ManageAuthorsPage` | ? Implemented |
+| 7 | ??? | Categories | Manage book categories | Go to Categories | - | ?? TODO |
+| 8 | ????? | Publishers | Manage publishers | Go to Publishers | - | ?? TODO |
+
+### **Row 4: Configuration**
+
+| Card # | Icon | Title | Description | Button | Navigation | Status |
+|--------|------|-------|-------------|--------|------------|--------|
+| 9 | ?? | Reports | View library statistics | View Reports | - | ?? TODO |
+| 10 | ?? | Settings | Configure library settings | Go to Settings | - | ?? TODO |
+
+---
+
+## ?? New Features
+
+### **1. Dynamic "Manage Users" Card**
+
+**XAML:**
+```xaml
+<Border Grid.Row="0" Grid.Column="2" Style="{StaticResource MenuCard}">
+    <StackPanel>
+        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+        <!-- Dynamic Title -->
+        <TextBlock x:Name="txtManageUsersTitle" 
+                   Text="Manage Members" 
+                   Style="{StaticResource CardTitle}"/>
+        <!-- Dynamic Description -->
+        <TextBlock x:Name="txtManageUsersDesc" 
+                   Text="View and manage members" 
+                   Style="{StaticResource CardDescription}"/>
+        <!-- Dynamic Button -->
+        <Button x:Name="btnManageUsers" 
+                Content="Go to Members" 
+                Style="{StaticResource MenuButton}" 
+                Click="ManageMembers_Click"/>
+    </StackPanel>
+</Border>
+```
+
+**C# Code:**
+```csharp
+private bool isAdmin = false;
+
+private void LoadDashboardData()
+{
+    var currentUser = MainWindow.CurrentUser;
+    if (currentUser != null)
+    {
+        txtLibrarianName.Text = $"{currentUser.FirstName} {currentUser.LastName}";
+        txtEmployeeId.Text = "EMP" + currentUser.UserID.ToString("D3");
+        
+        // Check if user is admin
+        CheckAdminStatus(currentUser.UserIdString);
+    }
+}
+```
+
+---
+
+### **2. Publishers Card (New)**
+
+**Position:** Row 2, Column 2  
+**Status:** ?? TODO - Not yet implemented
+
+**Planned Features:**
+- ????? Add/Edit/Delete publishers
+- ????? View publisher details
+- ????? Assign publishers to books
+- ????? Search publishers
+
+**Handler:**
+```csharp
+private void ManagePublishers_Click(object sender, RoutedEventArgs e)
+{
+    // TODO: Navigate to Manage Publishers page
+    MessageBox.Show("Navigate to Manage Publishers page", "Info", 
+        MessageBoxButton.OK, MessageBoxImage.Information);
+}
+```
+
+---
+
+## ?? Implementation Status
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Search Books (moved to row 1) | ? Complete | Fully functional |
+| Manage Books | ? Complete | Fully functional |
+| Manage Members/Users (dynamic) | ? Complete | Role-based display |
+| Manage Loans | ? Complete | Fully functional |
+| Reservations | ? Complete | Approve/Dis-approve/Cancel |
+| Manage Authors | ? Complete | Fully functional |
+| Categories | ?? TODO | Placeholder |
+| Publishers (new) | ?? TODO | Placeholder |
+| Reports | ?? TODO | Placeholder |
+| Settings | ?? TODO | Placeholder |
+
+---
+
+## ?? Migration Guide
+
+### **From Old Layout to New:**
+
+**Old Order (3ª3):**
+```
+1. Manage Books     2. Manage Authors    3. Manage Members
+4. Manage Loans     5. Reservations      6. Search Books
+7. Reports          8. Settings          9. Categories
+```
+
+**New Order (3ª4):**
+```
+1. Search Books     2. Manage Books      3. Manage Members/Users (dynamic)
+4. Manage Loans     5. Reservations      
+6. Manage Authors   7. Categories        8. Publishers (new)
+9. Reports          10. Settings
+```
+
+### **Key Changes:**
+1. **Search Books** moved from position 6 ? position 1
+2. **Manage Books** moved from position 1 ? position 2
+3. **Manage Members** moved from position 3 ? position 3 (but now dynamic)
+4. **Publishers** added at position 8
+5. **Categories** moved from position 9 ? position 7
+
+---
+
+## ?? Benefits of New Layout
+
+### **1. Improved User Flow:**
+- **Search first:** Most common action is at top-left
+- **Book management next:** Logical progression
+- **User management:** Prominent position, role-aware
+
+### **2. Better Organization:**
+- **Row 1:** Primary functions (search, books, users)
+- **Row 2:** Operations (loans, reservations)
+- **Row 3:** Data management (authors, categories, publishers)
+- **Row 4:** Configuration (reports, settings)
+
+### **3. Role-Based Access:**
+- **Regular librarians:** See only what they need
+- **Admin librarians:** See full user management options
+- **Dynamic UI:** No separate pages needed
+
+---
+
+## ??? Files Modified
+
+### **1. LibrarianDashboard.xaml**
+- Changed grid from 3ª3 to 3ª4
+- Reordered all cards
+- Added Publishers card
+- Made "Manage Members" card dynamic (x:Name attributes)
+
+### **2. LibrarianDashboard.xaml.cs**
+- Added `isAdmin` field
+- Added `CheckAdminStatus()` method
+- Added `ManagePublishers_Click()` handler
+- Updated `LoadDashboardData()` to check admin status
+
+### **3. MemberDB.cs** (Existing)
+- Already has `IsUserAdmin()` method
+- Queries `user_roles` table
+
+---
+
+## ? Testing Checklist
+
+- [x] Page loads without errors
+- [x] Regular librarian sees "Manage Members"
+- [x] Admin librarian sees "Manage Users"
+- [x] Search Books card is in top-left position
+- [x] Publishers card is displayed
+- [x] All 10 cards are visible
+- [x] Card layout is 3ª4 grid
+- [x] Navigation works for implemented pages
+- [x] Placeholder messages for TODO pages
+- [x] Role detection works correctly
+
+---
+
+## ?? Next Steps
+
+### **Implement TODO Pages:**
+
+#### **1. Publishers Page**
+- CRUD operations for publishers
+- Publisher details view
+- Assign publishers to books
+
+#### **2. Categories Page**
+- CRUD operations for categories
+- Category hierarchy
+- Assign categories to books
+
+#### **3. Reports Page**
+- Loan statistics
+- Popular books
+- Fine collection
+- Member activity
+
+#### **4. Settings Page**
+- Library configuration
+- Loan/reservation limits
+- Fine amounts
+- System preferences
+
+---
+
+## ?? Summary
+
+**Completed:**
+- ? Reorganized dashboard layout (3ª4)
+- ? Added role-based access control
+- ? Implemented dynamic "Manage Users" card
+- ? Added Publishers card (placeholder)
+- ? Moved Search Books to prominent position
+- ? Updated documentation
+
+**Remaining:**
+- ?? Implement Publishers page
+- ?? Implement Categories page
+- ?? Implement Reports page
+- ?? Implement Settings page
+
+**The dashboard now provides a better organized, role-aware interface for library staff!** ???

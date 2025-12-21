@@ -104,6 +104,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -111,36 +112,40 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Manage Books Card -->
+                <!-- Row 1: Search, Books, Users -->
+                
+                <!-- Search Books Card -->
                 <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
                         <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="Search Books" Style="{StaticResource CardTitle}"/>
+                        <TextBlock Text="Search the library catalog" Style="{StaticResource CardDescription}"/>
+                        <Button Content="Search" Style="{StaticResource MenuButton}" Click="SearchBooks_Click" MouseLeftButtonDown="NavigateToSearch"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Manage Books Card -->
+                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource MenuCard}">
+                    <StackPanel>
+                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Manage Books" Style="{StaticResource CardTitle}"/>
-                        <TextBlock Text="Add, edit, or remove books from the library" Style="{StaticResource CardDescription}"/>
+                        <TextBlock Text="Add, edit, or remove books from library" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Books" Style="{StaticResource MenuButton}" Click="ManageBooks_Click"/>
                     </StackPanel>
                 </Border>
 
-                <!-- Manage Authors Card -->
-                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource MenuCard}">
-                    <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
-                        <TextBlock Text="Manage Authors" Style="{StaticResource CardTitle}"/>
-                        <TextBlock Text="Add, edit, or remove book authors" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Authors" Style="{StaticResource MenuButton}" Click="ManageAuthors_Click"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- Manage Members Card -->
+                <!-- Manage Users/Members Card (Dynamic Text) -->
                 <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource MenuCard}">
                     <StackPanel>
                         <TextBlock Text="??" Style="{StaticResource IconText}"/>
-                        <TextBlock Text="Manage Members" Style="{StaticResource CardTitle}"/>
-                        <TextBlock Text="View and manage library members" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Members" Style="{StaticResource MenuButton}" Click="ManageMembers_Click"/>
+                        <TextBlock x:Name="txtManageUsersTitle" Text="Manage Members" Style="{StaticResource CardTitle}"/>
+                        <TextBlock x:Name="txtManageUsersDesc" Text="View and manage members" Style="{StaticResource CardDescription}"/>
+                        <Button x:Name="btnManageUsers" Content="Go to Members" Style="{StaticResource MenuButton}" Click="ManageMembers_Click"/>
                     </StackPanel>
                 </Border>
 
+                <!-- Row 2: Loans, Reservations -->
+                
                 <!-- Manage Loans Card -->
                 <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
@@ -161,18 +166,42 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Search Books Card -->
-                <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource MenuCard}">
+                <!-- Row 3: Authors, Categories, Publishers -->
+                
+                <!-- Manage Authors Card -->
+                <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
                         <TextBlock Text="??" Style="{StaticResource IconText}"/>
-                        <TextBlock Text="Search Books" Style="{StaticResource CardTitle}"/>
-                        <TextBlock Text="Search the library catalog" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Search" Style="{StaticResource MenuButton}" Click="SearchBooks_Click" MouseLeftButtonDown="NavigateToSearch"/>
+                        <TextBlock Text="Manage Authors" Style="{StaticResource CardTitle}"/>
+                        <TextBlock Text="Add, edit, or remove authors" Style="{StaticResource CardDescription}"/>
+                        <Button Content="Go to Authors" Style="{StaticResource MenuButton}" Click="ManageAuthors_Click"/>
                     </StackPanel>
                 </Border>
 
+                <!-- Categories Card -->
+                <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource MenuCard}">
+                    <StackPanel>
+                        <TextBlock Text="???" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="Categories" Style="{StaticResource CardTitle}"/>
+                        <TextBlock Text="Manage book categories" Style="{StaticResource CardDescription}"/>
+                        <Button Content="Go to Categories" Style="{StaticResource MenuButton}" Click="ManageCategories_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Publishers Card -->
+                <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource MenuCard}">
+                    <StackPanel>
+                        <TextBlock Text="?????" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="Publishers" Style="{StaticResource CardTitle}"/>
+                        <TextBlock Text="Manage publishers" Style="{StaticResource CardDescription}"/>
+                        <Button Content="Go to Publishers" Style="{StaticResource MenuButton}" Click="ManagePublishers_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Row 4: Reports, Settings -->
+                
                 <!-- Reports Card -->
-                <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource MenuCard}">
+                <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
                         <TextBlock Text="??" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Reports" Style="{StaticResource CardTitle}"/>
@@ -182,22 +211,12 @@
                 </Border>
 
                 <!-- Settings Card -->
-                <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource MenuCard}">
+                <Border Grid.Row="3" Grid.Column="1" Style="{StaticResource MenuCard}">
                     <StackPanel>
                         <TextBlock Text="??" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Settings" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Configure library settings" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Settings" Style="{StaticResource MenuButton}" Click="Settings_Click"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- Categories Card -->
-                <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource MenuCard}">
-                    <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
-                        <TextBlock Text="Categories" Style="{StaticResource CardTitle}"/>
-                        <TextBlock Text="Manage book categories" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Categories" Style="{StaticResource MenuButton}" Click="ManageCategories_Click"/>
                     </StackPanel>
                 </Border>
             </Grid>

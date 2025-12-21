@@ -414,6 +414,62 @@ namespace LibraryManagementSystem.ViewModel
         }
 
         /// <summary>
+        /// Checks if a member is suspended by user ID
+        /// </summary>
+        /// <param name="userId">User ID (GUID string)</param>
+        /// <returns>True if member is SUSPENDED, false if ACTIVE or not found</returns>
+        public bool IsMemberSuspended(string userId)
+        {
+            try
+            {
+                string query = @"
+                    SELECT membership_status
+                    FROM members
+                    WHERE user_id = ?";
+                
+                OleDbParameter param = new OleDbParameter("@UserID", OleDbType.VarChar, 36) { Value = userId };
+                object result = ExecuteScalar(query, param);
+                
+                if (result != null)
+                {
+                    string status = result.ToString();
+                    return status.Equals("SUSPENDED", StringComparison.OrdinalIgnoreCase);
+                }
+                
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to check member suspension status: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets member status by user ID
+        /// </summary>
+        /// <param name="userId">User ID (GUID string)</param>
+        /// <returns>Membership status (ACTIVE, SUSPENDED, etc.) or null if not found</returns>
+        public string GetMemberStatusByUserId(string userId)
+        {
+            try
+            {
+                string query = @"
+                    SELECT membership_status
+                    FROM members
+                    WHERE user_id = ?";
+                
+                OleDbParameter param = new OleDbParameter("@UserID", OleDbType.VarChar, 36) { Value = userId };
+                object result = ExecuteScalar(query, param);
+                
+                return result?.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get member status: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Gets all members
         /// </summary>
         /// <returns>List of all members</returns>

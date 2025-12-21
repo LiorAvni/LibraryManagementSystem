@@ -86,8 +86,8 @@ namespace LibraryManagementSystem.View.Pages
         private void ShowMessage(string message, bool isError)
         {
             txtMessage.Text = message;
-            txtMessage.Foreground = isError ? System.Windows.Media.Brushes.Red : System.Windows.Media.Brushes.Green;
-            txtMessage.Visibility = Visibility.Visible;
+            errorBorder.Visibility = Visibility.Visible;
         }
     }
 }
+

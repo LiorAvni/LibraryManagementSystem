@@ -11,6 +11,114 @@ namespace LibraryManagementSystem.ViewModel
     public class LoanDB : BaseDB
     {
         /// <summary>
+        /// Gets loans for management page with filtering and pagination
+        /// </summary>
+        /// <param name="memberName">Filter by member name (optional)</param>
+        /// <param name="bookTitle">Filter by book title (optional)</param>
+        /// <param name="status">Filter by status: ALL, ACTIVE, OVERDUE, RETURNED</param>
+        /// <param name="page">Page number (0-based)</param>
+        /// <param name="pageSize">Number of records per page</param>
+        /// <param name="totalRecords">Output: Total number of records matching filters</param>
+        /// <returns>DataTable with loan information</returns>
+        public DataTable GetLoansForManagement(string memberName, string bookTitle, string status, int page, int pageSize, out int totalRecords)
+        {
+            try
+            {
+                // Build WHERE clause based on filters
+                var whereConditions = new System.Collections.Generic.List<string>();
+                var parameters = new System.Collections.Generic.List<OleDbParameter>();
+
+                // Member name filter
+                if (!string.IsNullOrEmpty(memberName))
+                {
+                    whereConditions.Add("(u.first_name LIKE ? OR u.last_name LIKE ?)");
+                    string searchPattern = $"%{memberName}%";
+                    parameters.Add(new OleDbParameter("@FirstName", OleDbType.VarChar, 100) { Value = searchPattern });
+                    parameters.Add(new OleDbParameter("@LastName", OleDbType.VarChar, 100) { Value = searchPattern });
+                }
+
+                // Book title filter
+                if (!string.IsNullOrEmpty(bookTitle))
+                {
+                    whereConditions.Add("b.title LIKE ?");
+                    parameters.Add(new OleDbParameter("@BookTitle", OleDbType.VarChar, 200) { Value = $"%{bookTitle}%" });
+                }
+
+                // Status filter
+                if (!string.IsNullOrEmpty(status) && status != "ALL")
+                {
+                    if (status == "ACTIVE")
+                    {
+                        whereConditions.Add("(l.return_date IS NULL AND l.due_date >= Date())");
+                    }
+                    else if (status == "OVERDUE")
+                    {
+                        whereConditions.Add("(l.return_date IS NULL AND l.due_date < Date())");
+                    }
+                    else if (status == "RETURNED")
+                    {
+                        whereConditions.Add("l.return_date IS NOT NULL");
+                    }
+                }
+
+                string whereClause = whereConditions.Count > 0 ? "WHERE " + string.Join(" AND ", whereConditions) : "";
+
+                // Get total count
+                string countQuery = $@"
+                    SELECT COUNT(*) 
+                    FROM (((loans l
+                    INNER JOIN members m ON l.member_id = m.member_id)
+                    INNER JOIN users u ON m.user_id = u.user_id)
+                    INNER JOIN book_copies bc ON l.copy_id = bc.copy_id)
+                    INNER JOIN books b ON bc.book_id = b.book_id
+                    {whereClause}";
+
+                object countResult = ExecuteScalar(countQuery, parameters.ToArray());
+                totalRecords = countResult != null ? Convert.ToInt32(countResult) : 0;
+
+                // Get paginated results
+                int offset = page * pageSize;
+                
+                string dataQuery = $@"
+                    SELECT 
+                        l.loan_id,
+                        l.copy_id,
+                        u.first_name & ' ' & u.last_name AS MemberName,
+                        b.title AS BookTitle,
+                        l.loan_date,
+                        l.due_date,
+                        l.return_date,
+                        IIF(l.fine_amount IS NULL, 0, l.fine_amount) AS fine_amount
+                    FROM (((loans l
+                    INNER JOIN members m ON l.member_id = m.member_id)
+                    INNER JOIN users u ON m.user_id = u.user_id)
+                    INNER JOIN book_copies bc ON l.copy_id = bc.copy_id)
+                    INNER JOIN books b ON bc.book_id = b.book_id
+                    {whereClause}
+                    ORDER BY l.loan_date DESC";
+
+                DataTable allData = ExecuteQuery(dataQuery, parameters.ToArray());
+                
+                // Manual pagination (Access doesn't support OFFSET/FETCH)
+                DataTable paginatedData = allData.Clone();
+                int startRow = offset;
+                int endRow = Math.Min(offset + pageSize, allData.Rows.Count);
+                
+                for (int i = startRow; i < endRow; i++)
+                {
+                    paginatedData.ImportRow(allData.Rows[i]);
+                }
+                
+                return paginatedData;
+            }
+            catch (Exception ex)
+            {
+                totalRecords = 0;
+                throw new Exception($"Failed to get loans for management: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Gets all active loans for a specific member with book details
         /// </summary>
         /// <param name="userId">User ID (from users table)</param>
