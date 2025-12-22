@@ -1,0 +1,181 @@
+<Page x:Class="LibraryManagementSystem.View.Pages.EditPublisherPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Edit Publisher"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <!-- Button Styles -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980b9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#95a5a6"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#7f8c8d"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#f5f5f5">
+        <Grid MaxWidth="800" Margin="30">
+            <Border Background="White" Padding="40" CornerRadius="10">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                </Border.Effect>
+
+                <StackPanel>
+                    <TextBlock Text="Edit Publisher" FontSize="24" FontWeight="Bold" Foreground="#2c3e50" Margin="0,0,0,30"/>
+
+                    <!-- Error Message -->
+                    <Border x:Name="borderError" Background="#f8d7da" BorderBrush="#f5c6cb" BorderThickness="1" 
+                            Padding="15" CornerRadius="5" Margin="0,0,0,20" Visibility="Collapsed">
+                        <TextBlock x:Name="txtError" TextWrapping="Wrap" Foreground="#721c24"/>
+                    </Border>
+
+                    <!-- Publisher Name -->
+                    <StackPanel Margin="0,0,0,20">
+                        <TextBlock Text="Publisher Name *" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                        <TextBox x:Name="txtName" Padding="12" FontSize="14" BorderBrush="#ddd" BorderThickness="1" MaxLength="100">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Style.Triggers>
+                                        <Trigger Property="Text" Value="">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <VisualBrush Stretch="None" AlignmentX="Left">
+                                                        <VisualBrush.Visual>
+                                                            <TextBlock Text="Enter publisher name" 
+                                                                       Foreground="#999" 
+                                                                       Margin="5,0,0,0"/>
+                                                        </VisualBrush.Visual>
+                                                    </VisualBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </StackPanel>
+
+                    <!-- Country and Founded Year -->
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Country" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <TextBox x:Name="txtCountry" Padding="12" FontSize="14" BorderBrush="#ddd" BorderThickness="1" MaxLength="50">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <VisualBrush Stretch="None" AlignmentX="Left">
+                                                            <VisualBrush.Visual>
+                                                                <TextBlock Text="Enter country (optional)" 
+                                                                           Foreground="#999" 
+                                                                           Margin="5,0,0,0"/>
+                                                            </VisualBrush.Visual>
+                                                        </VisualBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Founded Year" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <TextBox x:Name="txtFoundedYear" Padding="12" FontSize="14" BorderBrush="#ddd" BorderThickness="1" MaxLength="4">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <VisualBrush Stretch="None" AlignmentX="Left">
+                                                            <VisualBrush.Visual>
+                                                                <TextBlock Text="Year (optional)" 
+                                                                           Foreground="#999" 
+                                                                           Margin="5,0,0,0"/>
+                                                            </VisualBrush.Visual>
+                                                        </VisualBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Website -->
+                    <StackPanel Margin="0,0,0,30">
+                        <TextBlock Text="Website" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                        <TextBox x:Name="txtWebsite" Padding="12" FontSize="14" BorderBrush="#ddd" BorderThickness="1" MaxLength="200">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Style.Triggers>
+                                        <Trigger Property="Text" Value="">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <VisualBrush Stretch="None" AlignmentX="Left">
+                                                        <VisualBrush.Visual>
+                                                            <TextBlock Text="Enter website URL (optional)" 
+                                                                       Foreground="#999" 
+                                                                       Margin="5,0,0,0"/>
+                                                        </VisualBrush.Visual>
+                                                    </VisualBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </StackPanel>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Update Publisher" Style="{StaticResource PrimaryButton}" Padding="24,12" Click="UpdatePublisher_Click"/>
+                        <Button Content="Cancel" Style="{StaticResource SecondaryButton}" Padding="24,12" Margin="10,0,0,0" Click="Cancel_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</Page>

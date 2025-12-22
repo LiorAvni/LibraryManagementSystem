@@ -135,7 +135,7 @@ namespace LibraryManagementSystem.ViewModel
         }
 
         /// <summary>
-        /// Gets all members with their details for management page
+        /// Gets all non-deleted members with their details for management page
         /// </summary>
         /// <returns>DataTable with member information</returns>
         public DataTable GetAllMembersWithDetails()
@@ -152,6 +152,7 @@ namespace LibraryManagementSystem.ViewModel
                         m.membership_status
                     FROM members m
                     INNER JOIN users u ON m.user_id = u.user_id
+                    WHERE m.membership_status <> 'DELETED'
                     ORDER BY u.last_name, u.first_name";
                 
                 return ExecuteQuery(query);
@@ -163,7 +164,7 @@ namespace LibraryManagementSystem.ViewModel
         }
 
         /// <summary>
-        /// Gets member statistics (total, active, suspended)
+        /// Gets member statistics (total, active, suspended) excluding DELETED members
         /// </summary>
         /// <returns>DataTable with count statistics</returns>
         public DataTable GetMemberStatistics()
@@ -175,7 +176,8 @@ namespace LibraryManagementSystem.ViewModel
                         COUNT(*) AS TotalMembers,
                         SUM(IIF(m.membership_status = 'ACTIVE', 1, 0)) AS ActiveMembers,
                         SUM(IIF(m.membership_status = 'SUSPENDED', 1, 0)) AS SuspendedMembers
-                    FROM members m";
+                    FROM members m
+                    WHERE m.membership_status <> 'DELETED'";
                 
                 return ExecuteQuery(query);
             }
@@ -338,7 +340,7 @@ namespace LibraryManagementSystem.ViewModel
         }
 
         /// <summary>
-        /// Deletes a member (only if they have no active loans or reservations)
+        /// Soft deletes a member by setting their status to 'DELETED'
         /// </summary>
         /// <param name="memberId">Member ID</param>
         /// <returns>True if successful</returns>
@@ -346,39 +348,15 @@ namespace LibraryManagementSystem.ViewModel
         {
             try
             {
-                // Check for active loans
-                string checkLoansQuery = @"
-                    SELECT COUNT(*) 
-                    FROM loans 
-                    WHERE member_id = ? AND return_date IS NULL";
+                // Soft delete by changing status to DELETED
+                string query = @"
+                    UPDATE members 
+                    SET membership_status = 'DELETED'
+                    WHERE member_id = ?";
                 
-                OleDbParameter loanParam = new OleDbParameter("@MemberID", OleDbType.VarChar, 36) { Value = memberId };
-                object loanCount = ExecuteScalar(checkLoansQuery, loanParam);
+                OleDbParameter param = new OleDbParameter("@MemberID", OleDbType.VarChar, 36) { Value = memberId };
                 
-                if (loanCount != null && Convert.ToInt32(loanCount) > 0)
-                {
-                    throw new Exception("Cannot delete member with active loans.");
-                }
-                
-                // Check for active reservations
-                string checkReservationsQuery = @"
-                    SELECT COUNT(*) 
-                    FROM reservations 
-                    WHERE member_id = ? AND reservation_status = 'ACTIVE'";
-                
-                OleDbParameter resParam = new OleDbParameter("@MemberID", OleDbType.VarChar, 36) { Value = memberId };
-                object resCount = ExecuteScalar(checkReservationsQuery, resParam);
-                
-                if (resCount != null && Convert.ToInt32(resCount) > 0)
-                {
-                    throw new Exception("Cannot delete member with active reservations.");
-                }
-                
-                // Delete the member
-                string deleteQuery = "DELETE FROM members WHERE member_id = ?";
-                OleDbParameter deleteParam = new OleDbParameter("@MemberID", OleDbType.VarChar, 36) { Value = memberId };
-                
-                return ExecuteNonQuery(deleteQuery, deleteParam) > 0;
+                return ExecuteNonQuery(query, param) > 0;
             }
             catch (Exception ex)
             {

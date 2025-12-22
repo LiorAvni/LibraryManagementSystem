@@ -114,8 +114,7 @@ namespace LibraryManagementSystem.View.Pages
 
         private void ManagePublishers_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Navigate to Manage Publishers page
-            MessageBox.Show("Navigate to Manage Publishers page", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            NavigationService?.Navigate(new ManagePublishersPage());
         }
 
         private void NavigateToSearch(object sender, MouseButtonEventArgs e)

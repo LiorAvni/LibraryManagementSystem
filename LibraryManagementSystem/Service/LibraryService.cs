@@ -542,12 +542,40 @@ namespace LibraryManagementSystem.Service
 
         public PublishersList GetAllPublishers()
         {
-            return _publisherDB.GetAllPublishers();
+            try
+            {
+                DataTable dt = _publisherDB.GetAllPublishers();
+                PublishersList publishers = new PublishersList();
+                
+                foreach (DataRow row in dt.Rows)
+                {
+                    publishers.Add(new Publisher
+                    {
+                        PublisherID = 0, // Not used in actual DB
+                        Name = row["name"]?.ToString() ?? "",
+                        Country = row["country"] != DBNull.Value ? row["country"]?.ToString() : "",
+                        Website = row["website"] != DBNull.Value ? row["website"]?.ToString() : "",
+                        Address = "",
+                        Phone = "",
+                        Email = "",
+                        CreatedAt = DateTime.Now,
+                        IsActive = true
+                    });
+                }
+                
+                return publishers;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get publishers: {ex.Message}", ex);
+            }
         }
 
         public bool AddPublisher(Publisher publisher)
         {
-            return _publisherDB.InsertPublisher(publisher);
+            int? foundedYear = null;
+            // If you want to add founded year to Publisher model, extract it here
+            return _publisherDB.InsertPublisher(publisher.Name, publisher.Country ?? "", publisher.Website ?? "", foundedYear);
         }
 
         public CategoriesList GetAllCategories()

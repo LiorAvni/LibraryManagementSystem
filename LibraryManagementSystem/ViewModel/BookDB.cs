@@ -497,7 +497,7 @@ namespace LibraryManagementSystem.ViewModel
         }
 
         /// <summary>
-        /// Gets all authors
+        /// Gets all non-deleted authors
         /// </summary>
         /// <returns>DataTable with author_id and full name</returns>
         public DataTable GetAllAuthors()
@@ -507,6 +507,7 @@ namespace LibraryManagementSystem.ViewModel
                 string query = @"
                     SELECT author_id, first_name, last_name, biography, birth_date, first_name & ' ' & last_name AS full_name
                     FROM authors
+                    WHERE is_deleted = False OR is_deleted IS NULL
                     ORDER BY last_name, first_name";
                 
                 return ExecuteQuery(query);
@@ -518,7 +519,7 @@ namespace LibraryManagementSystem.ViewModel
         }
 
         /// <summary>
-        /// Gets a specific author by ID
+        /// Gets a specific non-deleted author by ID
         /// </summary>
         /// <param name="authorId">Author ID (GUID string)</param>
         /// <returns>DataTable with author information</returns>
@@ -529,7 +530,7 @@ namespace LibraryManagementSystem.ViewModel
                 string query = @"
                     SELECT author_id, first_name, last_name, biography, birth_date
                     FROM authors
-                    WHERE author_id = ?";
+                    WHERE author_id = ? AND (is_deleted = False OR is_deleted IS NULL)";
                 
                 OleDbParameter param = new OleDbParameter("@AuthorID", OleDbType.VarChar, 36) { Value = authorId };
                 return ExecuteQuery(query, param);
@@ -554,15 +555,16 @@ namespace LibraryManagementSystem.ViewModel
             try
             {
                 string query = @"
-                    INSERT INTO authors (author_id, first_name, last_name, biography, birth_date)
-                    VALUES (?, ?, ?, ?, ?)";
+                    INSERT INTO authors (author_id, first_name, last_name, biography, birth_date, is_deleted)
+                    VALUES (?, ?, ?, ?, ?, ?)";
                 
                 OleDbParameter[] parameters = {
                     new OleDbParameter("@AuthorID", OleDbType.VarChar, 36) { Value = authorId },
                     new OleDbParameter("@FirstName", OleDbType.VarChar, 50) { Value = firstName },
                     new OleDbParameter("@LastName", OleDbType.VarChar, 50) { Value = lastName },
                     new OleDbParameter("@Biography", OleDbType.LongVarChar) { Value = biography ?? (object)DBNull.Value },
-                    new OleDbParameter("@BirthDate", OleDbType.Date) { Value = birthDate ?? (object)DBNull.Value }
+                    new OleDbParameter("@BirthDate", OleDbType.Date) { Value = birthDate ?? (object)DBNull.Value },
+                    new OleDbParameter("@IsDeleted", OleDbType.Boolean) { Value = false }
                 };
                 
                 return ExecuteNonQuery(query, parameters) > 0;
@@ -608,7 +610,7 @@ namespace LibraryManagementSystem.ViewModel
         }
 
         /// <summary>
-        /// Deletes an author (only if they have no books)
+        /// Soft deletes an author (sets is_deleted to True)
         /// </summary>
         /// <param name="authorId">Author ID (GUID string)</param>
         /// <returns>True if successful</returns>
@@ -616,14 +618,7 @@ namespace LibraryManagementSystem.ViewModel
         {
             try
             {
-                // Check if author has books
-                int bookCount = GetAuthorBookCount(authorId);
-                if (bookCount > 0)
-                {
-                    throw new Exception($"Cannot delete author. Author is associated with {bookCount} book(s).");
-                }
-                
-                string query = "DELETE FROM authors WHERE author_id = ?";
+                string query = "UPDATE authors SET is_deleted = True WHERE author_id = ?";
                 OleDbParameter param = new OleDbParameter("@AuthorID", OleDbType.VarChar, 36) { Value = authorId };
                 
                 return ExecuteNonQuery(query, param) > 0;

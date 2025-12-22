@@ -185,7 +185,7 @@
                                 Cursor="IBeam"/>
                         
                         <StackPanel>
-                            <TextBox Text="admin@library.com - Administrator"
+                            <TextBox Text="admin@library.com - Librarian (Admin)"
                                     IsReadOnly="True"
                                     FontSize="12"
                                     Foreground="#888"
