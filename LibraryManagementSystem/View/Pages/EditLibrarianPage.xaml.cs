@@ -6,41 +6,42 @@ using LibraryManagementSystem.ViewModel;
 
 namespace LibraryManagementSystem.View.Pages
 {
-    public partial class EditMemberPage : Page
+    public partial class EditLibrarianPage : Page
     {
         private readonly MemberDB _memberDB;
-        private readonly string _memberId;
+        private readonly string _librarianId;
 
-        public EditMemberPage(string memberId)
+        public EditLibrarianPage(string librarianId)
         {
             InitializeComponent();
             _memberDB = new MemberDB();
-            _memberId = memberId;
+            _librarianId = librarianId;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadMemberData();
+            LoadLibrarianData();
         }
 
-        private void LoadMemberData()
+        private void LoadLibrarianData()
         {
             try
             {
-                DataTable dt = _memberDB.GetMemberDetailsById(_memberId);
+                DataTable dt = _memberDB.GetLibrarianDetailsById(_librarianId);
                 
                 if (dt.Rows.Count > 0)
                 {
                     DataRow row = dt.Rows[0];
                     
                     // Set info box
-                    txtInfoMemberId.Text = row["member_id"].ToString();
+                    txtInfoLibrarianId.Text = row["librarian_id"].ToString();
                     txtInfoUserId.Text = row["user_id"].ToString();
+                    txtInfoEmployeeId.Text = row["employee_id"]?.ToString() ?? "N/A";
                     
-                    if (row["membership_date"] != DBNull.Value)
+                    if (row["hire_date"] != DBNull.Value)
                     {
-                        DateTime membershipDate = Convert.ToDateTime(row["membership_date"]);
-                        txtInfoMembershipDate.Text = membershipDate.ToString("MMMM dd, yyyy");
+                        DateTime hireDate = Convert.ToDateTime(row["hire_date"]);
+                        txtInfoHireDate.Text = hireDate.ToString("MMMM dd, yyyy");
                     }
                     
                     // Set form fields
@@ -51,25 +52,25 @@ namespace LibraryManagementSystem.View.Pages
                     txtAddress.Text = row["address"]?.ToString() ?? "";
                     
                     // Set status
-                    string status = row["membership_status"]?.ToString() ?? "ACTIVE";
-                    foreach (ComboBoxItem item in cmbMembershipStatus.Items)
+                    string status = row["librarian_status"]?.ToString() ?? "ACTIVE";
+                    foreach (ComboBoxItem item in cmbLibrarianStatus.Items)
                     {
                         if (item.Content.ToString() == status)
                         {
-                            cmbMembershipStatus.SelectedItem = item;
+                            cmbLibrarianStatus.SelectedItem = item;
                             break;
                         }
                     }
                 }
                 else
                 {
-                    ShowError("Member not found.");
+                    ShowError("Librarian not found.");
                     NavigationService?.GoBack();
                 }
             }
             catch (Exception ex)
             {
-                ShowError($"Error loading member data: {ex.Message}");
+                ShowError($"Error loading librarian data: {ex.Message}");
             }
         }
 
@@ -117,15 +118,15 @@ namespace LibraryManagementSystem.View.Pages
                 string email = txtEmail.Text.Trim();
                 string phone = txtPhone.Text.Trim();
                 string address = txtAddress.Text.Trim();
-                string status = (cmbMembershipStatus.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "ACTIVE";
+                string status = (cmbLibrarianStatus.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "ACTIVE";
                 
-                // Update member
-                bool success = _memberDB.UpdateMemberInformation(_memberId, firstName, lastName, 
-                                                                 email, phone, address, status);
+                // Update librarian
+                bool success = _memberDB.UpdateLibrarianInformation(_librarianId, firstName, lastName, 
+                                                                     email, phone, address, status);
                 
                 if (success)
                 {
-                    ShowSuccess($"Member information updated successfully!\n\nName: {firstName} {lastName}\nStatus: {status}");
+                    ShowSuccess($"Librarian information updated successfully!\n\nName: {firstName} {lastName}\nStatus: {status}");
                     
                     // Navigate back after 2 seconds
                     var timer = new System.Windows.Threading.DispatcherTimer();
@@ -139,7 +140,7 @@ namespace LibraryManagementSystem.View.Pages
                 }
                 else
                 {
-                    ShowError("Failed to update member information. Please try again.");
+                    ShowError("Failed to update librarian information. Please try again.");
                 }
             }
             catch (Exception ex)

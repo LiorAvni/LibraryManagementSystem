@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
@@ -339,8 +339,15 @@ namespace LibraryManagementSystem.View.Pages
         {
             if (sender is Button button && button.Tag is LibrarianModel librarian)
             {
-                MessageBox.Show($"View Librarian Details\n\nID: {librarian.LibrarianId}\nName: {librarian.FullName}", 
-                    "Librarian Details", MessageBoxButton.OK, MessageBoxImage.Information);
+                NavigationService?.Navigate(new LibrarianDetailsPage(librarian.LibrarianId));
+            }
+        }
+
+        private void EditLibrarian_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is LibrarianModel librarian)
+            {
+                NavigationService?.Navigate(new EditLibrarianPage(librarian.LibrarianId));
             }
         }
 
@@ -509,8 +516,7 @@ namespace LibraryManagementSystem.View.Pages
         {
             if (sender is Button button && button.Tag is AdminModel admin)
             {
-                MessageBox.Show($"View Admin Details\n\nID: {admin.AdminId}\nName: {admin.FullName}", 
-                    "Admin Details", MessageBoxButton.OK, MessageBoxImage.Information);
+                NavigationService?.Navigate(new LibrarianDetailsPage(admin.AdminId, isAdmin: true));
             }
         }
 

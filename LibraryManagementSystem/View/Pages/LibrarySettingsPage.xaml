@@ -44,52 +44,8 @@
     </Page.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Top Navigation Menu -->
-        <Border Grid.Row="0" Background="#34495e" Padding="0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="btnNavDashboard" 
-                        Content="🏠 Dashboard" 
-                        Background="Transparent"
-                        Foreground="White"
-                        BorderThickness="0,0,0,3"
-                        BorderBrush="#3498db"
-                        Padding="20,12"
-                        FontWeight="SemiBold"
-                        FontSize="14"
-                        Cursor="Hand"
-                        Click="NavDashboard_Click">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" 
-                                                Padding="{TemplateBinding Padding}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                BorderBrush="{TemplateBinding BorderBrush}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#3d4f63"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
-        </Border>
-
         <!-- Main Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#f5f5f5">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#f5f5f5">
             <StackPanel Margin="30" MaxWidth="1000">
                 
                 <!-- Page Title -->
@@ -241,9 +197,6 @@
                             <Button Content="💾 Save Changes" 
                                     Style="{StaticResource PrimaryButton}"
                                     Click="SaveSettings_Click"/>
-                            <Button Content="🔄 Reset" 
-                                    Style="{StaticResource SecondaryButton}"
-                                    Click="ResetSettings_Click"/>
                         </StackPanel>
 
                     </StackPanel>

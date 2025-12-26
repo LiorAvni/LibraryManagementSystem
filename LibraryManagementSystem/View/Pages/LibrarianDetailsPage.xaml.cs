@@ -7,48 +7,54 @@ using LibraryManagementSystem.ViewModel;
 
 namespace LibraryManagementSystem.View.Pages
 {
-    public partial class MemberDetailsPage : Page
+    public partial class LibrarianDetailsPage : Page
     {
         private readonly MemberDB _memberDB;
-        private readonly string _memberId;
+        private readonly string _librarianId;
+        private readonly bool _isAdmin;
 
-        public MemberDetailsPage(string memberId)
+        public LibrarianDetailsPage(string librarianId, bool isAdmin = false)
         {
             InitializeComponent();
             _memberDB = new MemberDB();
-            _memberId = memberId;
+            _librarianId = librarianId;
+            _isAdmin = isAdmin;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadMemberDetails();
+            LoadLibrarianDetails();
         }
 
-        private void LoadMemberDetails()
+        private void LoadLibrarianDetails()
         {
             try
             {
-                DataTable dt = _memberDB.GetMemberDetailsById(_memberId);
+                DataTable dt = _memberDB.GetLibrarianDetailsById(_librarianId);
                 
                 if (dt.Rows.Count > 0)
                 {
                     DataRow row = dt.Rows[0];
                     
-                    // Set member information
+                    // Set page title based on role
+                    txtPageTitle.Text = _isAdmin ? "Admin Details" : "Librarian Details";
+                    
+                    // Set librarian information
+                    txtEmployeeId.Text = row["employee_id"]?.ToString() ?? "N/A";
                     txtFullName.Text = $"{row["first_name"]} {row["last_name"]}";
                     txtEmail.Text = row["email"]?.ToString() ?? "N/A";
                     txtPhone.Text = row["phone"]?.ToString() ?? "N/A";
                     txtAddress.Text = row["address"]?.ToString() ?? "N/A";
                     
-                    // Format membership date
-                    if (row["membership_date"] != DBNull.Value)
+                    // Format hire date
+                    if (row["hire_date"] != DBNull.Value)
                     {
-                        DateTime membershipDate = Convert.ToDateTime(row["membership_date"]);
-                        txtMembershipDate.Text = membershipDate.ToString("MMMM dd, yyyy");
+                        DateTime hireDate = Convert.ToDateTime(row["hire_date"]);
+                        txtHireDate.Text = hireDate.ToString("MMMM dd, yyyy");
                     }
                     
                     // Set status with badge styling
-                    string status = row["membership_status"]?.ToString() ?? "ACTIVE";
+                    string status = row["librarian_status"]?.ToString() ?? "ACTIVE";
                     txtStatus.Text = status;
                     
                     switch (status.ToUpper())
@@ -73,14 +79,14 @@ namespace LibraryManagementSystem.View.Pages
                 }
                 else
                 {
-                    MessageBox.Show("Member not found.", "Error", 
+                    MessageBox.Show("Librarian not found.", "Error", 
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     NavigationService?.GoBack();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading member details: {ex.Message}", "Error", 
+                MessageBox.Show($"Error loading librarian details: {ex.Message}", "Error", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

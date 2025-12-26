@@ -381,7 +381,7 @@ Loaded="Page_Loaded">
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="Actions" Width="Auto" MinWidth="250">
+                                    <DataGridTemplateColumn Header="Actions" Width="Auto" MinWidth="310">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
@@ -391,6 +391,14 @@ Loaded="Page_Loaded">
                                                             FontSize="13"
                                                             Margin="0,0,5,0"
                                                             Click="ViewLibrarian_Click"
+                                                            Tag="{Binding}"/>
+                                                    
+                                                    <Button Content="✏️ Edit" 
+                                                            Style="{StaticResource PrimaryButton}" 
+                                                            Padding="12,6"
+                                                            FontSize="13"
+                                                            Margin="0,0,5,0"
+                                                            Click="EditLibrarian_Click"
                                                             Tag="{Binding}"/>
                                                     
                                                     <Button Content="{Binding SuspendButtonText}" 
@@ -561,7 +569,7 @@ Loaded="Page_Loaded">
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="Actions" Width="Auto" MinWidth="250">
+                                    <DataGridTemplateColumn Header="Actions" Width="Auto" MinWidth="80">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
@@ -569,37 +577,7 @@ Loaded="Page_Loaded">
                                                             Style="{StaticResource PrimaryButton}" 
                                                             Padding="12,6"
                                                             FontSize="13"
-                                                            Margin="0,0,5,0"
                                                             Click="ViewAdmin_Click"
-                                                            Tag="{Binding}"/>
-                                                    
-                                                    <Button Content="{Binding SuspendButtonText}" 
-                                                            Background="{Binding SuspendButtonBackground}"
-                                                            Foreground="White"
-                                                            Padding="12,6"
-                                                            FontSize="13"
-                                                            FontWeight="SemiBold"
-                                                            BorderThickness="0"
-                                                            Cursor="Hand"
-                                                            Margin="0,0,5,0"
-                                                            Click="ToggleSuspendAdmin_Click"
-                                                            Tag="{Binding}">
-                                                        <Button.Template>
-                                                            <ControlTemplate TargetType="Button">
-                                                                <Border Background="{TemplateBinding Background}" 
-                                                                        CornerRadius="5" 
-                                                                        Padding="{TemplateBinding Padding}">
-                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                            </ControlTemplate>
-                                                        </Button.Template>
-                                                    </Button>
-                                                    
-                                                    <Button Content="🗑️ Delete" 
-                                                            Style="{StaticResource DangerButton}" 
-                                                            Padding="12,6"
-                                                            FontSize="13"
-                                                            Click="DeleteAdmin_Click"
                                                             Tag="{Binding}"/>
                                                 </StackPanel>
                                             </DataTemplate>

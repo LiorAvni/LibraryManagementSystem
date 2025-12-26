@@ -1,7 +1,7 @@
-﻿<Page x:Class="LibraryManagementSystem.View.Pages.MemberDetailsPage"
+﻿<Page x:Class="LibraryManagementSystem.View.Pages.LibrarianDetailsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Member Details"
+      Title="Librarian Details"
       Loaded="Page_Loaded">
 
     <Page.Resources>
@@ -42,7 +42,7 @@
                         <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
                     </Border.Effect>
                     <StackPanel>
-                        <TextBlock Text="Member Details" FontSize="24" FontWeight="Bold" Foreground="#2c3e50" Margin="0,0,0,20" Padding="0,0,0,10"/>
+                        <TextBlock x:Name="txtPageTitle" Text="Librarian Details" FontSize="24" FontWeight="Bold" Foreground="#2c3e50" Margin="0,0,0,20" Padding="0,0,0,10"/>
                         <Border BorderBrush="#ecf0f1" BorderThickness="0,0,0,2" Margin="0,0,0,20"/>
 
                         <Grid>
@@ -56,44 +56,50 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <!-- Status -->
+                            <!-- Employee ID -->
                             <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,20,15">
+                                <TextBlock Text="Employee ID" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBlock x:Name="txtEmployeeId" Text="N/A" Foreground="#2c3e50" FontSize="16"/>
+                            </StackPanel>
+
+                            <!-- Hire Date -->
+                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,15">
+                                <TextBlock Text="Hire Date" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBlock x:Name="txtHireDate" Text="N/A" Foreground="#2c3e50" FontSize="16"/>
+                            </StackPanel>
+
+                            <!-- Status -->
+                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,20,15">
                                 <TextBlock Text="Status" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
                                 <Border x:Name="borderStatus" CornerRadius="5" Padding="8,4" HorizontalAlignment="Left">
                                     <TextBlock x:Name="txtStatus" Text="ACTIVE" FontWeight="SemiBold" FontSize="14"/>
                                 </Border>
                             </StackPanel>
 
-                            <!-- Membership Date -->
-                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,15">
-                                <TextBlock Text="Membership Date" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                                <TextBlock x:Name="txtMembershipDate" Text="N/A" Foreground="#2c3e50" FontSize="16"/>
-                            </StackPanel>
-
                             <!-- Full Name -->
-                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,20,15">
+                            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,15">
                                 <TextBlock Text="Full Name" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
                                 <TextBlock x:Name="txtFullName" Text="N/A" Foreground="#2c3e50" FontSize="16"/>
                             </StackPanel>
 
                             <!-- Email -->
-                            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,15">
+                            <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,20,15">
                                 <TextBlock Text="Email" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
                                 <TextBlock x:Name="txtEmail" Text="N/A" Foreground="#2c3e50" FontSize="16"/>
                             </StackPanel>
 
                             <!-- Phone -->
-                            <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,20,15">
+                            <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,15">
                                 <TextBlock Text="Phone" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
                                 <TextBlock x:Name="txtPhone" Text="N/A" Foreground="#2c3e50" FontSize="16"/>
                             </StackPanel>
-
-                            <!-- Address -->
-                            <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,15">
-                                <TextBlock Text="Address" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                                <TextBlock x:Name="txtAddress" Text="N/A" Foreground="#2c3e50" FontSize="16" TextWrapping="Wrap"/>
-                            </StackPanel>
                         </Grid>
+
+                        <!-- Address (Full Width) -->
+                        <StackPanel Margin="0,0,0,15">
+                            <TextBlock Text="Address" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                            <TextBlock x:Name="txtAddress" Text="N/A" Foreground="#2c3e50" FontSize="16" TextWrapping="Wrap"/>
+                        </StackPanel>
 
                         <Button Content="🔙 Back to Members" 
                                 Style="{StaticResource SecondaryButton}" 

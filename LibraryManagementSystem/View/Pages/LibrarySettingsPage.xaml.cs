@@ -78,20 +78,6 @@ namespace LibraryManagementSystem.View.Pages
             }
         }
 
-        private void ResetSettings_Click(object sender, RoutedEventArgs e)
-        {
-            var result = MessageBox.Show(
-                "Are you sure you want to reset all changes?\n\nThis will reload the current settings from the database.",
-                "Confirm Reset",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                LoadSettings();
-            }
-        }
-
         private bool ValidateInputs()
         {
             // Validate Fine Per Day (must be a positive decimal)
@@ -143,11 +129,6 @@ namespace LibraryManagementSystem.View.Pages
             }
 
             return true;
-        }
-
-        private void NavDashboard_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService?.Navigate(new LibrarianDashboard());
         }
     }
 }

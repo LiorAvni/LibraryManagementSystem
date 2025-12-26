@@ -685,5 +685,105 @@ namespace LibraryManagementSystem.ViewModel
                 throw new Exception($"Failed to get librarian status: {ex.Message}", ex);
             }
         }
+
+        /// <summary>
+        /// Gets detailed librarian information by librarian ID
+        /// </summary>
+        /// <param name="librarianId">Librarian ID (GUID string)</param>
+        /// <returns>DataTable with detailed librarian information</returns>
+        public DataTable GetLibrarianDetailsById(string librarianId)
+        {
+            try
+            {
+                string query = @"
+                    SELECT 
+                        l.librarian_id,
+                        l.user_id,
+                        l.employee_id,
+                        l.hire_date,
+                        l.librarian_status,
+                        u.first_name,
+                        u.last_name,
+                        u.email,
+                        u.phone,
+                        u.address
+                    FROM librarians l
+                    INNER JOIN users u ON l.user_id = u.user_id
+                    WHERE l.librarian_id = ?";
+                
+                OleDbParameter param = new OleDbParameter("@LibrarianID", OleDbType.VarChar, 36) { Value = librarianId };
+                return ExecuteQuery(query, param);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get librarian details: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Updates librarian information
+        /// </summary>
+        /// <param name="librarianId">Librarian ID</param>
+        /// <param name="firstName">First name</param>
+        /// <param name="lastName">Last name</param>
+        /// <param name="email">Email</param>
+        /// <param name="phone">Phone</param>
+        /// <param name="address">Address</param>
+        /// <param name="librarianStatus">Librarian status</param>
+        /// <returns>True if successful</returns>
+        public bool UpdateLibrarianInformation(string librarianId, string firstName, string lastName, 
+                                                string email, string phone, string address, string librarianStatus)
+        {
+            try
+            {
+                // First, get the user_id for this librarian
+                string getUserQuery = "SELECT user_id FROM librarians WHERE librarian_id = ?";
+                OleDbParameter getUserParam = new OleDbParameter("@LibrarianID", OleDbType.VarChar, 36) { Value = librarianId };
+                object userIdObj = ExecuteScalar(getUserQuery, getUserParam);
+                
+                if (userIdObj == null)
+                {
+                    return false;
+                }
+                
+                string userId = userIdObj.ToString();
+                
+                // Update user information
+                string updateUserQuery = @"
+                    UPDATE users 
+                    SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?
+                    WHERE user_id = ?";
+                
+                OleDbParameter[] userParams = {
+                    new OleDbParameter("@FirstName", OleDbType.VarChar, 50) { Value = firstName },
+                    new OleDbParameter("@LastName", OleDbType.VarChar, 50) { Value = lastName },
+                    new OleDbParameter("@Email", OleDbType.VarChar, 100) { Value = email },
+                    new OleDbParameter("@Phone", OleDbType.VarChar, 20) { Value = phone ?? (object)DBNull.Value },
+                    new OleDbParameter("@Address", OleDbType.LongVarChar) { Value = address ?? (object)DBNull.Value },
+                    new OleDbParameter("@UserID", OleDbType.VarChar, 36) { Value = userId }
+                };
+                
+                int userResult = ExecuteNonQuery(updateUserQuery, userParams);
+                
+                // Update librarian status
+                string updateLibrarianQuery = @"
+                    UPDATE librarians 
+                    SET librarian_status = ?
+                    WHERE librarian_id = ?";
+                
+                OleDbParameter[] librarianParams = {
+                    new OleDbParameter("@Status", OleDbType.VarChar, 20) { Value = librarianStatus },
+                    new OleDbParameter("@LibrarianID", OleDbType.VarChar, 36) { Value = librarianId }
+                };
+                
+                int librarianResult = ExecuteNonQuery(updateLibrarianQuery, librarianParams);
+                
+                return userResult > 0 && librarianResult > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to update librarian information: {ex.Message}", ex);
+            }
+        }
     }
 }
