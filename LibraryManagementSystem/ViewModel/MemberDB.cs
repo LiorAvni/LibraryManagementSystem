@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.OleDb;
 using LibraryManagementSystem.Model;
@@ -659,6 +659,31 @@ namespace LibraryManagementSystem.ViewModel
                 UpdatedAt = row["UpdatedAt"] != DBNull.Value ? Convert.ToDateTime(row["UpdatedAt"]) : (DateTime?)null,
                 IsActive = row["IsActive"] != DBNull.Value && Convert.ToBoolean(row["IsActive"])
             };
+        }
+
+        /// <summary>
+        /// Gets librarian status by user ID
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Librarian status (ACTIVE, SUSPENDED, etc.) or null if not found</returns>
+        public string GetLibrarianStatusByUserId(string userId)
+        {
+            try
+            {
+                string query = @"
+                    SELECT librarian_status
+                    FROM librarians
+                    WHERE user_id = ?";
+                
+                OleDbParameter param = new OleDbParameter("@UserID", OleDbType.VarChar, 36) { Value = userId };
+                object result = ExecuteScalar(query, param);
+                
+                return result?.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get librarian status: {ex.Message}", ex);
+            }
         }
     }
 }

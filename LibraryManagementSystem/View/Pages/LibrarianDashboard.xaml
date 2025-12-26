@@ -91,10 +91,25 @@
                         <Run x:Name="txtLibrarianName" Text="Librarian"/>
                         <Run Text="!"/>
                     </TextBlock>
-                    <TextBlock FontSize="14" Foreground="#7f8c8d">
-                        <Run Text="Employee ID: "/>
-                        <Run x:Name="txtEmployeeId" Text="N/A" FontWeight="Bold"/>
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="14" Foreground="#7f8c8d" Margin="0,0,20,0">
+                            <Run Text="Employee ID: "/>
+                            <Run x:Name="txtEmployeeId" Text="N/A" FontWeight="Bold"/>
+                        </TextBlock>
+                        <TextBlock FontSize="14" Foreground="#7f8c8d">
+                            <Run Text="Status: "/>
+                        </TextBlock>
+                        <Border x:Name="borderStatus" CornerRadius="5" Padding="8,4" Margin="5,0,0,0">
+                            <TextBlock x:Name="txtStatus" Text="ACTIVE" FontWeight="SemiBold" FontSize="12"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock x:Name="txtSuspendedWarning" 
+                               Text="⚠️ Your account is suspended. All actions are disabled. Please contact administration." 
+                               FontSize="14" 
+                               Foreground="#dc3545" 
+                               FontWeight="SemiBold"
+                               Margin="0,15,0,0"
+                               Visibility="Collapsed"/>
                 </StackPanel>
             </Border>
 
@@ -120,7 +135,7 @@
                         <TextBlock Text="🔍" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Search Books" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Search the library catalog" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Search" Style="{StaticResource MenuButton}" Click="SearchBooks_Click" MouseLeftButtonDown="NavigateToSearch"/>
+                        <Button x:Name="btnSearchBooks" Content="Search" Style="{StaticResource MenuButton}" Click="SearchBooks_Click" MouseLeftButtonDown="NavigateToSearch"/>
                     </StackPanel>
                 </Border>
 
@@ -130,7 +145,7 @@
                         <TextBlock Text="📚" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Manage Books" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Add, edit, or remove books from library" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Books" Style="{StaticResource MenuButton}" Click="ManageBooks_Click"/>
+                        <Button x:Name="btnManageBooks" Content="Go to Books" Style="{StaticResource MenuButton}" Click="ManageBooks_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -152,7 +167,7 @@
                         <TextBlock Text="📖" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Manage Loans" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Process book loans and returns" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Loans" Style="{StaticResource MenuButton}" Click="ManageLoans_Click"/>
+                        <Button x:Name="btnManageLoans" Content="Go to Loans" Style="{StaticResource MenuButton}" Click="ManageLoans_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -162,7 +177,7 @@
                         <TextBlock Text="📅" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Reservations" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="View and manage book reservations" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Reservations" Style="{StaticResource MenuButton}" Click="ManageReservations_Click"/>
+                        <Button x:Name="btnManageReservations" Content="Go to Reservations" Style="{StaticResource MenuButton}" Click="ManageReservations_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -174,7 +189,7 @@
                         <TextBlock Text="👤" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Manage Authors" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Add, edit, or remove authors" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Authors" Style="{StaticResource MenuButton}" Click="ManageAuthors_Click"/>
+                        <Button x:Name="btnManageAuthors" Content="Go to Authors" Style="{StaticResource MenuButton}" Click="ManageAuthors_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -184,7 +199,7 @@
                         <TextBlock Text="🏷️" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Categories" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Manage book categories" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Categories" Style="{StaticResource MenuButton}" Click="ManageCategories_Click"/>
+                        <Button x:Name="btnManageCategories" Content="Go to Categories" Style="{StaticResource MenuButton}" Click="ManageCategories_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -194,7 +209,7 @@
                         <TextBlock Text="🏢" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Publishers" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Manage publishers" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Publishers" Style="{StaticResource MenuButton}" Click="ManagePublishers_Click"/>
+                        <Button x:Name="btnManagePublishers" Content="Go to Publishers" Style="{StaticResource MenuButton}" Click="ManagePublishers_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -206,7 +221,7 @@
                         <TextBlock Text="📊" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Reports" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="View library statistics and reports" Style="{StaticResource CardDescription}"/>
-                        <Button Content="View Reports" Style="{StaticResource MenuButton}" Click="ViewReports_Click"/>
+                        <Button x:Name="btnViewReports" Content="View Reports" Style="{StaticResource MenuButton}" Click="ViewReports_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -216,7 +231,7 @@
                         <TextBlock Text="⚙️" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Settings" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Configure library settings" Style="{StaticResource CardDescription}"/>
-                        <Button Content="Go to Settings" Style="{StaticResource MenuButton}" Click="Settings_Click"/>
+                        <Button x:Name="btnSettings" Content="Go to Settings" Style="{StaticResource MenuButton}" Click="Settings_Click"/>
                     </StackPanel>
                 </Border>
             </Grid>
