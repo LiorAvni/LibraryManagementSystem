@@ -31,22 +31,55 @@ public partial class MainWindow : Window
             txtUserInfo.Text = $"Welcome, {user.FullName} ({user.Role.ToUpper()})";
             btnLogout.Visibility = Visibility.Visible;
             
+            System.Diagnostics.Debug.WriteLine($"=== UpdateUserInfo START ===");
+            System.Diagnostics.Debug.WriteLine($"User: {user.FullName}");
+            System.Diagnostics.Debug.WriteLine($"Role: {user.Role}");
+            System.Diagnostics.Debug.WriteLine($"UserIdString: {user.UserIdString}");
+            
             // Show navigation menu based on role
             if (user.Role?.ToLower() == "member")
             {
+                System.Diagnostics.Debug.WriteLine("Role is MEMBER");
                 memberNavBar.Visibility = Visibility.Visible;
                 librarianNavBar.Visibility = Visibility.Collapsed;
+                adminNavBar.Visibility = Visibility.Collapsed;
+                System.Diagnostics.Debug.WriteLine($"memberNavBar: Visible, librarianNavBar: Collapsed, adminNavBar: Collapsed");
             }
-            else if (user.Role?.ToLower() == "librarian")
+            else if (user.Role?.ToLower() == "librarian" || user.Role?.ToLower() == "admin")
             {
+                System.Diagnostics.Debug.WriteLine($"Role is {user.Role.ToUpper()} - checking admin status...");
+                
+                // Check if user is admin (either role=ADMIN or has ADMIN in user_roles)
+                bool isAdmin = user.Role?.ToLower() == "admin" || CheckIfUserIsAdmin(user.UserIdString);
+                
+                System.Diagnostics.Debug.WriteLine($"IsAdmin result: {isAdmin}");
+                
                 memberNavBar.Visibility = Visibility.Collapsed;
-                librarianNavBar.Visibility = Visibility.Visible;
+                
+                if (isAdmin)
+                {
+                    System.Diagnostics.Debug.WriteLine("User IS admin - showing ADMIN nav bar");
+                    librarianNavBar.Visibility = Visibility.Collapsed;
+                    adminNavBar.Visibility = Visibility.Visible;
+                    System.Diagnostics.Debug.WriteLine($"After setting: memberNavBar={memberNavBar.Visibility}, librarianNavBar={librarianNavBar.Visibility}, adminNavBar={adminNavBar.Visibility}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("User is NOT admin - showing LIBRARIAN nav bar");
+                    librarianNavBar.Visibility = Visibility.Visible;
+                    adminNavBar.Visibility = Visibility.Collapsed;
+                    System.Diagnostics.Debug.WriteLine($"After setting: memberNavBar={memberNavBar.Visibility}, librarianNavBar={librarianNavBar.Visibility}, adminNavBar={adminNavBar.Visibility}");
+                }
             }
             else
             {
+                System.Diagnostics.Debug.WriteLine($"Role is OTHER: {user.Role}");
                 memberNavBar.Visibility = Visibility.Collapsed;
                 librarianNavBar.Visibility = Visibility.Collapsed;
+                adminNavBar.Visibility = Visibility.Collapsed;
             }
+            
+            System.Diagnostics.Debug.WriteLine($"=== UpdateUserInfo END ===");
         }
         else
         {
@@ -54,6 +87,24 @@ public partial class MainWindow : Window
             btnLogout.Visibility = Visibility.Collapsed;
             memberNavBar.Visibility = Visibility.Collapsed;
             librarianNavBar.Visibility = Visibility.Collapsed;
+            adminNavBar.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private bool CheckIfUserIsAdmin(string userId)
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine($"CheckIfUserIsAdmin called with userId: {userId}");
+            var memberDB = new LibraryManagementSystem.ViewModel.MemberDB();
+            bool result = memberDB.IsUserAdmin(userId);
+            System.Diagnostics.Debug.WriteLine($"IsUserAdmin returned: {result}");
+            return result;
+        }
+        catch (System.Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error in CheckIfUserIsAdmin: {ex.Message}");
+            return false;
         }
     }
 
@@ -102,6 +153,13 @@ public partial class MainWindow : Window
         MainFrame.Navigate(new LibrarianDashboard());
     }
 
+    // Admin Navigation Handler
+    private void NavAdminDashboard_Click(object sender, RoutedEventArgs e)
+    {
+        btnNavAdminDashboard.Tag = "Active";
+        MainFrame.Navigate(new LibrarianDashboard());
+    }
+
     private void MainFrame_Navigated(object sender, NavigationEventArgs e)
     {
         // Update active navigation button based on current page and role
@@ -116,11 +174,18 @@ public partial class MainWindow : Window
             else if (e.Content is SearchBooksPage)
                 btnNavSearchBooks.Tag = "Active";
         }
-        else if (CurrentUser?.Role?.ToLower() == "librarian")
+        else if (CurrentUser?.Role?.ToLower() == "librarian" || CurrentUser?.Role?.ToLower() == "admin")
         {
-            // Librarian dashboard is always active (only one button)
+            // Check if user is admin (either role=ADMIN or has ADMIN in user_roles)
+            bool isAdmin = CurrentUser.Role?.ToLower() == "admin" || CheckIfUserIsAdmin(CurrentUser.UserIdString);
+            
             if (e.Content is LibrarianDashboard)
-                btnNavLibrarianDashboard.Tag = "Active";
+            {
+                if (isAdmin)
+                    btnNavAdminDashboard.Tag = "Active";
+                else
+                    btnNavLibrarianDashboard.Tag = "Active";
+            }
         }
     }
 

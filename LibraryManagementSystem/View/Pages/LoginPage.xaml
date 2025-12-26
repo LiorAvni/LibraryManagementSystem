@@ -1,4 +1,4 @@
-<Page x:Class="LibraryManagementSystem.View.Pages.LoginPage"
+﻿<Page x:Class="LibraryManagementSystem.View.Pages.LoginPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -97,7 +97,7 @@
 
             <StackPanel>
                 <!-- Header -->
-                <TextBlock Text="?? Library System" 
+                <TextBlock Text="📚 Library System" 
                           FontSize="28" 
                           FontWeight="Bold"
                           HorizontalAlignment="Center" 

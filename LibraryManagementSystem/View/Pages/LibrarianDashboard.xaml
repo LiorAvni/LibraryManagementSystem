@@ -1,4 +1,4 @@
-<Page x:Class="LibraryManagementSystem.View.Pages.LibrarianDashboard"
+﻿<Page x:Class="LibraryManagementSystem.View.Pages.LibrarianDashboard"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Librarian Dashboard"
@@ -117,7 +117,7 @@
                 <!-- Search Books Card -->
                 <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="🔍" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Search Books" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Search the library catalog" Style="{StaticResource CardDescription}"/>
                         <Button Content="Search" Style="{StaticResource MenuButton}" Click="SearchBooks_Click" MouseLeftButtonDown="NavigateToSearch"/>
@@ -127,7 +127,7 @@
                 <!-- Manage Books Card -->
                 <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="📚" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Manage Books" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Add, edit, or remove books from library" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Books" Style="{StaticResource MenuButton}" Click="ManageBooks_Click"/>
@@ -137,7 +137,7 @@
                 <!-- Manage Users/Members Card (Dynamic Text) -->
                 <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="👥" Style="{StaticResource IconText}"/>
                         <TextBlock x:Name="txtManageUsersTitle" Text="Manage Members" Style="{StaticResource CardTitle}"/>
                         <TextBlock x:Name="txtManageUsersDesc" Text="View and manage members" Style="{StaticResource CardDescription}"/>
                         <Button x:Name="btnManageUsers" Content="Go to Members" Style="{StaticResource MenuButton}" Click="ManageMembers_Click"/>
@@ -149,7 +149,7 @@
                 <!-- Manage Loans Card -->
                 <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="📖" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Manage Loans" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Process book loans and returns" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Loans" Style="{StaticResource MenuButton}" Click="ManageLoans_Click"/>
@@ -159,7 +159,7 @@
                 <!-- Reservations Card -->
                 <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="📅" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Reservations" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="View and manage book reservations" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Reservations" Style="{StaticResource MenuButton}" Click="ManageReservations_Click"/>
@@ -171,7 +171,7 @@
                 <!-- Manage Authors Card -->
                 <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="👤" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Manage Authors" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Add, edit, or remove authors" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Authors" Style="{StaticResource MenuButton}" Click="ManageAuthors_Click"/>
@@ -181,7 +181,7 @@
                 <!-- Categories Card -->
                 <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="???" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="🏷️" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Categories" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Manage book categories" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Categories" Style="{StaticResource MenuButton}" Click="ManageCategories_Click"/>
@@ -191,7 +191,7 @@
                 <!-- Publishers Card -->
                 <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="?????" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="🏢" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Publishers" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Manage publishers" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Publishers" Style="{StaticResource MenuButton}" Click="ManagePublishers_Click"/>
@@ -203,7 +203,7 @@
                 <!-- Reports Card -->
                 <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="📊" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Reports" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="View library statistics and reports" Style="{StaticResource CardDescription}"/>
                         <Button Content="View Reports" Style="{StaticResource MenuButton}" Click="ViewReports_Click"/>
@@ -213,7 +213,7 @@
                 <!-- Settings Card -->
                 <Border Grid.Row="3" Grid.Column="1" Style="{StaticResource MenuCard}">
                     <StackPanel>
-                        <TextBlock Text="??" Style="{StaticResource IconText}"/>
+                        <TextBlock Text="⚙️" Style="{StaticResource IconText}"/>
                         <TextBlock Text="Settings" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Configure library settings" Style="{StaticResource CardDescription}"/>
                         <Button Content="Go to Settings" Style="{StaticResource MenuButton}" Click="Settings_Click"/>

@@ -109,6 +109,23 @@
             </StackPanel>
         </Border>
 
+        <!-- Admin Navigation Menu -->
+        <Border Grid.Row="1" Background="#e74c3c" x:Name="adminNavBar" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="⚠️ ADMIN MODE ⚠️" 
+                          Foreground="White" 
+                          FontWeight="Bold" 
+                          FontSize="14"
+                          VerticalAlignment="Center"
+                          Margin="0,0,20,0"/>
+                <Button x:Name="btnNavAdminDashboard" 
+                        Content="🏠 Dashboard" 
+                        Style="{StaticResource NavButton}" 
+                        Click="NavAdminDashboard_Click"
+                        Tag="Active"/>
+            </StackPanel>
+        </Border>
+
         <!-- Main Content Frame -->
         <Frame x:Name="MainFrame" 
               Grid.Row="2" 

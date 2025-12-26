@@ -57,27 +57,17 @@ CREATE TABLE copy_statuses (
     description MEMO
 );
 
-INSERT INTO copy_statuses (status_code, status_name, description) VALUES
-('AVAILABLE', 'Available', 'Copy is available for borrowing'),
-('BORROWED', 'Borrowed', 'Copy is currently borrowed'),
-('DAMAGED', 'Damaged', 'Copy is damaged and needs repair'),
-('LOST', 'Lost', 'Copy has been reported lost'),
-('RETIRED', 'Retired', 'Copy has been retired from circulation'),
-('RESERVED', 'Reserved', 'Copy is reserved for a member'),
-('IN_REPAIR', 'In Repair', 'Copy is being repaired');
-
 CREATE TABLE copy_conditions (
     condition_code VARCHAR(20) PRIMARY KEY,
     condition_name VARCHAR(50) NOT NULL,
     description MEMO
 );
 
-INSERT INTO copy_conditions (condition_code, condition_name, description) VALUES
-('NEW', 'New', 'Brand new condition'),
-('GOOD', 'Good', 'Good condition with minimal wear'),
-('FAIR', 'Fair', 'Fair condition with some wear'),
-('POOR', 'Poor', 'Poor condition, significant wear'),
-('DAMAGED', 'Damaged', 'Damaged and needs attention');
+CREATE TABLE account_statuses (
+    status_code VARCHAR(20) PRIMARY KEY,
+    status_name VARCHAR(50) NOT NULL,
+    description MEMO
+);
 
 CREATE TABLE books (
     book_id TEXT(36) PRIMARY KEY,
@@ -123,23 +113,13 @@ CREATE TABLE book_authors (
     CONSTRAINT fk_book_authors_author FOREIGN KEY (author_id) REFERENCES authors(author_id)
 );
 
-CREATE TABLE account_statuses (
-    status_code VARCHAR(20) PRIMARY KEY,
-    status_name VARCHAR(50) NOT NULL,
-    description MEMO
-);
-
-INSERT INTO account_statuses (status_code, status_name, description) VALUES
-('ACTIVE', 'Active', 'User is active'),
-('SUSPENDED', 'Suspended', 'User is suspended'),
-('DELETED', 'Deleted', 'User is deleted');
-
 CREATE TABLE members (
     member_id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     membership_date DATETIME NOT NULL,
     membership_status VARCHAR(20) NOT NULL,
-    CONSTRAINT fk_members_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_members_user FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_members_status FOREIGN KEY (membership_status) REFERENCES account_statuses(status_code)
 );
 
 CREATE UNIQUE INDEX idx_members_user ON members(user_id);
@@ -149,24 +129,10 @@ CREATE TABLE librarians (
     user_id TEXT(36) NOT NULL,
     employee_id TEXT(20),
     hire_date DATETIME NOT NULL,
-    librarian_status VARCHAR(20) NOT NULL
+    librarian_status VARCHAR(20) NOT NULL,
+    CONSTRAINT fk_librarians_user FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_librarians_status FOREIGN KEY (librarian_status) REFERENCES account_statuses(status_code)
 );
-
-ALTER TABLE librarians
-ADD CONSTRAINT fk_librarians_user
-FOREIGN KEY (user_id) REFERENCES users(user_id);
-
-ALTER TABLE members
-ADD CONSTRAINT fk_members_account_status
-FOREIGN KEY (membership_status) REFERENCES account_statuses(status_code);
-ALTER TABLE members
-ALTER COLUMN membership_status SET DEFAULT 'ACTIVE';
-
-ALTER TABLE librarians
-ADD CONSTRAINT fk_librarians_account_status
-FOREIGN KEY (librarian_status) REFERENCES account_statuses(status_code);
-ALTER TABLE librarians
-ALTER COLUMN librarian_status SET DEFAULT 'ACTIVE';
 
 CREATE UNIQUE INDEX idx_librarians_user ON librarians(user_id);
 
@@ -225,3 +191,30 @@ CREATE INDEX idx_books_publisher ON books(publisher_id);
 CREATE INDEX idx_books_category ON books(category_id);
 CREATE INDEX idx_loans_member ON loans(member_id);
 CREATE INDEX idx_loans_copy ON loans(copy_id);
+
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+
+
+-- Insert Account Statuses (reference data for user account states)
+-- MUST BE INSERTED BEFORE librarians and members (FK constraint)
+INSERT INTO account_statuses (status_code, status_name, description) VALUES ('ACTIVE', 'Active', 'User account is active');
+INSERT INTO account_statuses (status_code, status_name, description) VALUES ('SUSPENDED', 'Suspended', 'User account is suspended');
+INSERT INTO account_statuses (status_code, status_name, description) VALUES ('DELETED', 'Deleted', 'User account is deleted');
+
+-- Insert Copy Statuses (reference data for book copy states)
+INSERT INTO copy_statuses (status_code, status_name, description) VALUES ('AVAILABLE', 'Available', 'Copy is available for borrowing');
+INSERT INTO copy_statuses (status_code, status_name, description) VALUES ('BORROWED', 'Borrowed', 'Copy is currently borrowed');
+INSERT INTO copy_statuses (status_code, status_name, description) VALUES ('DAMAGED', 'Damaged', 'Copy is damaged and needs repair');
+INSERT INTO copy_statuses (status_code, status_name, description) VALUES ('LOST', 'Lost', 'Copy has been reported lost');
+INSERT INTO copy_statuses (status_code, status_name, description) VALUES ('RETIRED', 'Retired', 'Copy has been retired from circulation');
+INSERT INTO copy_statuses (status_code, status_name, description) VALUES ('RESERVED', 'Reserved', 'Copy is reserved for a member');
+INSERT INTO copy_statuses (status_code, status_name, description) VALUES ('IN_REPAIR', 'In Repair', 'Copy is being repaired');
+
+-- Insert Copy Conditions (reference data for book copy physical condition)
+INSERT INTO copy_conditions (condition_code, condition_name, description) VALUES ('NEW', 'New', 'Brand new condition');
+INSERT INTO copy_conditions (condition_code, condition_name, description) VALUES ('GOOD', 'Good', 'Good condition with minimal wear');
+INSERT INTO copy_conditions (condition_code, condition_name, description) VALUES ('FAIR', 'Fair', 'Fair condition with some wear');
+INSERT INTO copy_conditions (condition_code, condition_name, description) VALUES ('POOR', 'Poor', 'Poor condition, significant wear');
+INSERT INTO copy_conditions (condition_code, condition_name, description) VALUES ('DAMAGED', 'Damaged', 'Damaged and needs attention');

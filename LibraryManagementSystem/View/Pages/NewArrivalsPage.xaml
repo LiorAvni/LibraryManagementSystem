@@ -1,4 +1,4 @@
-<Page x:Class="LibraryManagementSystem.View.Pages.NewArrivalsPage"
+﻿<Page x:Class="LibraryManagementSystem.View.Pages.NewArrivalsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="New Arrivals"
@@ -83,7 +83,7 @@
                 </Border.Effect>
                 <StackPanel>
                     <TextBlock FontSize="24" FontWeight="SemiBold" Foreground="#2c3e50">
-                        <Run Text="?? New Arrivals ("/>
+                        <Run Text="🆕 New Arrivals ("/>
                         <Run x:Name="txtTotalBooks" Text="0"/>
                         <Run Text=" books)"/>
                     </TextBlock>
@@ -107,7 +107,7 @@
 
                         <!-- Search Box -->
                         <StackPanel Grid.Column="0" Margin="0,0,15,0">
-                            <TextBlock Text="?? Search" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <TextBlock Text="🔍 Search" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
                             <TextBox x:Name="txtSearch" 
                                      Padding="10" 
                                      FontSize="14"
@@ -116,7 +116,7 @@
 
                         <!-- Category Filter -->
                         <StackPanel Grid.Column="1" Margin="0,0,15,0">
-                            <TextBlock Text="?? Category" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <TextBlock Text="🏷️ Category" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
                             <ComboBox x:Name="cmbCategory" 
                                       Padding="10" 
                                       FontSize="14"
@@ -136,7 +136,7 @@
 
                         <!-- Available Only Checkbox -->
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="? Availability" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
+                            <TextBlock Text="✅ Availability" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,8"/>
                             <Border Background="#f8f9fa" BorderBrush="#ddd" BorderThickness="1" CornerRadius="5" Padding="10">
                                 <CheckBox x:Name="chkAvailableOnly" 
                                           Content="Available only" 
@@ -244,14 +244,14 @@
                                             </Grid.ColumnDefinitions>
                                             
                                             <Button Grid.Column="0" 
-                                                    Content="?? Borrow" 
+                                                    Content="📚 Borrow" 
                                                     Style="{StaticResource PrimaryButton}"
                                                     Margin="0,0,5,0"
                                                     IsEnabled="{Binding IsAvailable}"
                                                     Click="BorrowBook_Click"
                                                     Tag="{Binding}"/>
                                             <Button Grid.Column="1" 
-                                                    Content="?? Reserve" 
+                                                    Content="📌 Reserve" 
                                                     Style="{StaticResource SecondaryButton}"
                                                     Margin="5,0,0,0"
                                                     Click="ReserveBook_Click"

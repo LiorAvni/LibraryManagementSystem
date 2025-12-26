@@ -1,4 +1,4 @@
-<Page x:Class="LibraryManagementSystem.View.Pages.EditMemberPage"
+﻿<Page x:Class="LibraryManagementSystem.View.Pages.EditMemberPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Edit Member"
@@ -52,7 +52,7 @@
         <Border Grid.Row="0" Background="#34495e" Padding="0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button x:Name="btnNavDashboard" 
-                        Content="? Dashboard" 
+                        Content="🏠 Dashboard" 
                         Background="Transparent"
                         Foreground="White"
                         BorderThickness="0"
@@ -221,7 +221,7 @@
 
                         <!-- Buttons -->
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="?? Save Changes" 
+                            <Button Content="💾 Save Changes" 
                                     Style="{StaticResource PrimaryButton}" 
                                     Padding="25,12"
                                     Click="SaveChanges_Click"/>

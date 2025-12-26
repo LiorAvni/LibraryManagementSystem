@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -103,8 +103,7 @@ namespace LibraryManagementSystem.View.Pages
 
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Navigate to Settings page
-            MessageBox.Show("Navigate to Settings page", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            NavigationService?.Navigate(new LibrarySettingsPage());
         }
 
         private void ManageCategories_Click(object sender, RoutedEventArgs e)
