@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
@@ -11,6 +11,10 @@ namespace LibraryManagementSystem.View.Pages
     {
         private readonly ReservationDB _reservationDB;
         private ObservableCollection<ManageReservationDisplayModel> reservations;
+        
+        private string filterMemberName = "";
+        private string filterBookTitle = "";
+        private string filterStatus = "ALL";
 
         public ManageReservationsPage()
         {
@@ -31,8 +35,11 @@ namespace LibraryManagementSystem.View.Pages
             {
                 reservations.Clear();
 
-                // Get all reservations from database
-                DataTable dt = _reservationDB.GetAllReservationsForManagement();
+                // Get reservations from database with filters
+                DataTable dt = _reservationDB.GetReservationsForManagement(
+                    filterMemberName, 
+                    filterBookTitle, 
+                    filterStatus);
 
                 foreach (DataRow row in dt.Rows)
                 {
@@ -53,6 +60,25 @@ namespace LibraryManagementSystem.View.Pages
                 MessageBox.Show($"Error loading reservations: {ex.Message}", "Error", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void Filter_Click(object sender, RoutedEventArgs e)
+        {
+            filterMemberName = txtMemberName.Text.Trim();
+            filterBookTitle = txtBookTitle.Text.Trim();
+            filterStatus = ((ComboBoxItem)cmbStatus.SelectedItem)?.Tag?.ToString() ?? "ALL";
+            LoadReservations();
+        }
+
+        private void ClearFilters_Click(object sender, RoutedEventArgs e)
+        {
+            txtMemberName.Clear();
+            txtBookTitle.Clear();
+            cmbStatus.SelectedIndex = 0;
+            filterMemberName = "";
+            filterBookTitle = "";
+            filterStatus = "ALL";
+            LoadReservations();
         }
 
         private void ApproveReservation_Click(object sender, RoutedEventArgs e)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
@@ -97,10 +97,11 @@ namespace LibraryManagementSystem.View.Pages
 
             var filtered = allBooks.Where(book =>
             {
-                // Keyword filter (search in title, author, category)
+                // Keyword filter (search in title, author, publisher, category, ISBN)
                 var matchesKeyword = string.IsNullOrEmpty(keyword) ||
                     book.Title.ToLower().Contains(keyword) ||
                     book.Author.ToLower().Contains(keyword) ||
+                    book.Publisher.ToLower().Contains(keyword) ||
                     book.Category.ToLower().Contains(keyword) ||
                     book.ISBN.ToLower().Contains(keyword);
 
@@ -158,6 +159,20 @@ namespace LibraryManagementSystem.View.Pages
                     {
                         MessageBox.Show("Please login to borrow books.", "Login Required", 
                             MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // ✅ CHECK IF MEMBER IS SUSPENDED
+                    var memberDB = new MemberDB();
+                    bool isSuspended = memberDB.IsMemberSuspended(currentUser.UserIdString);
+                    if (isSuspended)
+                    {
+                        MessageBox.Show(
+                            "Your account is currently suspended. You cannot borrow books.\n\n" +
+                            "Please contact the library for more information.",
+                            "Account Suspended",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
                         return;
                     }
 
@@ -222,6 +237,20 @@ namespace LibraryManagementSystem.View.Pages
                     {
                         MessageBox.Show("Please login to reserve books.", "Login Required", 
                             MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // ✅ CHECK IF MEMBER IS SUSPENDED
+                    var memberDB = new MemberDB();
+                    bool isSuspended = memberDB.IsMemberSuspended(currentUser.UserIdString);
+                    if (isSuspended)
+                    {
+                        MessageBox.Show(
+                            "Your account is currently suspended. You cannot reserve books.\n\n" +
+                            "Please contact the library for more information.",
+                            "Account Suspended",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
                         return;
                     }
 

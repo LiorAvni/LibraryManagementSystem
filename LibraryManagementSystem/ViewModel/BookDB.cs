@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.OleDb;
 using LibraryManagementSystem.Model;
@@ -1285,6 +1285,61 @@ namespace LibraryManagementSystem.ViewModel
             catch (Exception ex)
             {
                 throw new Exception($"Failed to retire book: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets copy status statistics for a book
+        /// </summary>
+        /// <param name="bookId">Book ID</param>
+        /// <returns>Tuple with (TotalCopies, AvailableCopies, UnavailableCopies)</returns>
+        public (int Total, int Available, int Unavailable) GetBookCopyStatistics(string bookId)
+        {
+            try
+            {
+                // Get total copies
+                string totalQuery = "SELECT COUNT(*) FROM book_copies WHERE book_id = ?";
+                OleDbParameter totalParam = new OleDbParameter("@BookID", OleDbType.VarChar, 36) { Value = bookId };
+                object totalResult = ExecuteScalar(totalQuery, totalParam);
+                int totalCopies = totalResult != null ? Convert.ToInt32(totalResult) : 0;
+
+                // Get available copies
+                string availQuery = "SELECT COUNT(*) FROM book_copies WHERE book_id = ? AND status = 'AVAILABLE'";
+                OleDbParameter availParam = new OleDbParameter("@BookID", OleDbType.VarChar, 36) { Value = bookId };
+                object availResult = ExecuteScalar(availQuery, availParam);
+                int availableCopies = availResult != null ? Convert.ToInt32(availResult) : 0;
+
+                // Calculate unavailable copies
+                int unavailableCopies = totalCopies - availableCopies;
+
+                return (totalCopies, availableCopies, unavailableCopies);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get copy statistics: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Retires available copies of a book
+        /// </summary>
+        /// <param name="bookId">Book ID</param>
+        /// <returns>Number of copies retired</returns>
+        public int RetireAvailableCopies(string bookId)
+        {
+            try
+            {
+                string query = @"
+                    UPDATE book_copies 
+                    SET status = 'RETIRED' 
+                    WHERE book_id = ? AND status = 'AVAILABLE'";
+                
+                OleDbParameter param = new OleDbParameter("@BookID", OleDbType.VarChar, 36) { Value = bookId };
+                return ExecuteNonQuery(query, param);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to retire book copies: {ex.Message}", ex);
             }
         }
 

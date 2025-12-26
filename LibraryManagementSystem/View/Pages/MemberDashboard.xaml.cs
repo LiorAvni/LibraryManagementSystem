@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -502,13 +502,17 @@ namespace LibraryManagementSystem.View.Pages
                         {
                             // Reload all data from database
                             LoadCurrentLoans(); // This will remove the returned book
+                            LoadUnpaidFines(); // This will show the new fine if overdue
                             LoadLoanHistory(); // This will show the book as returned
                             LoadTotalBorrowedCount(); // Update total count
                             UpdateStatistics(); // Update statistics
                             
+                            string fineMessage = loan.Fine > 0 
+                                ? $"{Environment.NewLine}Fine amount: ${loan.Fine:F2}{Environment.NewLine}Please pay the fine in the 'Fine Payment' section below."
+                                : "";
+                            
                             MessageBox.Show(
-                                $"Book '{loan.BookTitle}' returned successfully!{Environment.NewLine}" +
-                                $"Fine amount: ${loan.Fine:F2}",
+                                $"Book '{loan.BookTitle}' returned successfully!{fineMessage}",
                                 "Success",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Information);
@@ -587,6 +591,164 @@ namespace LibraryManagementSystem.View.Pages
                             MessageBoxImage.Error);
                     }
                 }
+            }
+        }
+
+        private void BorrowReservedBook_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is ReservationDisplayModel reservation)
+            {
+                // Check if user is suspended
+                var currentUser = MainWindow.CurrentUser;
+                if (currentUser == null)
+                {
+                    MessageBox.Show("User session expired. Please log in again.", "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                try
+                {
+                    // Check if member is suspended
+                    bool isSuspended = _memberDB.IsMemberSuspended(currentUser.UserIdString);
+                    if (isSuspended)
+                    {
+                        MessageBox.Show(
+                            "Your account is currently suspended. You cannot borrow books.\n\n" +
+                            "Please contact the library for more information.",
+                            "Account Suspended",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Get active loan count to check limits
+                    DataTable activeLoansTable = _loanDB.GetMemberActiveLoansWithDetails(currentUser.UserIdString);
+                    int currentLoans = activeLoansTable.Rows.Count;
+
+                    // Get max loans from settings
+                    var settingsDB = new SettingsDB();
+                    int maxLoans = settingsDB.GetMaxLoansPerMember();
+
+                    if (currentLoans >= maxLoans)
+                    {
+                        MessageBox.Show(
+                            $"You have reached the maximum number of active loans ({maxLoans}).\n\n" +
+                            "Please return a book before borrowing another one.",
+                            "Loan Limit Reached",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Confirm borrowing
+                    var result = MessageBox.Show(
+                        $"Do you want to borrow '{reservation.BookTitle}' by {reservation.Author}?\n\n" +
+                        $"This will convert your reservation into an active loan.",
+                        "Confirm Borrow",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        if (string.IsNullOrEmpty(reservation.ReservationIdString))
+                        {
+                            MessageBox.Show("Invalid reservation ID.", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        // Get the book ID from reservation
+                        string bookId = GetBookIdFromReservation(reservation.ReservationIdString);
+                        if (string.IsNullOrEmpty(bookId))
+                        {
+                            MessageBox.Show("Could not find the reserved book.", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        // Get loan period from settings
+                        int loanPeriodDays = settingsDB.GetLoanPeriodDays();
+
+                        // Borrow the book (this will create a loan and update copy status)
+                        bool borrowSuccess = _loanDB.BorrowBook(bookId, currentUser.UserIdString, loanPeriodDays);
+
+                        if (borrowSuccess)
+                        {
+                            // Cancel the reservation (since it's now fulfilled)
+                            _reservationDB.CancelReservation(reservation.ReservationIdString);
+
+                            // Reload all data
+                            LoadCurrentLoans();
+                            LoadReservations();
+                            UpdateStatistics();
+
+                            MessageBox.Show(
+                                $"You have successfully borrowed '{reservation.BookTitle}'!\n\n" +
+                                $"Due date: {DateTime.Now.AddDays(loanPeriodDays):yyyy-MM-dd}\n" +
+                                $"Please return the book by the due date to avoid fines.",
+                                "Book Borrowed",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                "Failed to borrow the book. The copy may no longer be available.\n\n" +
+                                "Please contact the librarian for assistance.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error borrowing book: {ex.Message}",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private string GetBookIdFromReservation(string reservationId)
+        {
+            try
+            {
+                string query = "SELECT book_id FROM reservations WHERE reservation_id = @reservationId";
+                var memberDB = new MemberDB();
+                
+                // Use ExecuteScalar to get the book_id
+                object result = ExecuteScalarQuery(query, reservationId);
+                return result?.ToString() ?? "";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting book ID from reservation: {ex.Message}");
+                return "";
+            }
+        }
+
+        private object ExecuteScalarQuery(string query, string parameter)
+        {
+            try
+            {
+                using (var conn = new System.Data.OleDb.OleDbConnection(BaseDB.ConnectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new System.Data.OleDb.OleDbCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@reservationId", parameter);
+                        return cmd.ExecuteScalar();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error executing scalar query: {ex.Message}");
+                return null;
             }
         }
 

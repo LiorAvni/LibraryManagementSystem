@@ -48,6 +48,9 @@ namespace LibraryManagementSystem.View.Pages
                     txtManageUsersTitle.Text = "Manage Users";
                     txtManageUsersDesc.Text = "View and manage members, librarians & admins";
                     btnManageUsers.Content = "Go to Users";
+                    
+                    // Show Settings card for admin
+                    settingsCard.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -55,6 +58,9 @@ namespace LibraryManagementSystem.View.Pages
                     txtManageUsersTitle.Text = "Manage Members";
                     txtManageUsersDesc.Text = "View and manage members";
                     btnManageUsers.Content = "Go to Members";
+                    
+                    // Hide Settings card for normal librarian
+                    settingsCard.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)

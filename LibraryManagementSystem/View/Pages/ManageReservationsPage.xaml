@@ -74,6 +74,7 @@
             <Grid MaxWidth="1400" Margin="30">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -85,8 +86,67 @@
                     <TextBlock Text="Manage Reservations" FontSize="24" FontWeight="Bold" Foreground="#2c3e50"/>
                 </Border>
 
+                <!-- Search/Filter Section -->
+                <Border Grid.Row="1" Background="White" Padding="30" CornerRadius="10" Margin="0,0,0,30">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="Search Reservations" FontSize="18" FontWeight="SemiBold" Foreground="#2c3e50" Margin="0,0,0,20"/>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Member Name -->
+                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                <TextBlock Text="Member Name" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtMemberName" Padding="10" FontSize="14" BorderBrush="#bdc3c7" BorderThickness="1"/>
+                            </StackPanel>
+
+                            <!-- Book Title -->
+                            <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                                <TextBlock Text="Book Title" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtBookTitle" Padding="10" FontSize="14" BorderBrush="#bdc3c7" BorderThickness="1"/>
+                            </StackPanel>
+
+                            <!-- Status -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Status" Foreground="#7f8c8d" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbStatus" Padding="10" FontSize="14" BorderBrush="#bdc3c7" BorderThickness="1" SelectedIndex="0">
+                                    <ComboBoxItem Content="All Status" Tag="ALL"/>
+                                    <ComboBoxItem Content="Pending" Tag="PENDING"/>
+                                    <ComboBoxItem Content="Reserved" Tag="RESERVED"/>
+                                    <ComboBoxItem Content="Fulfilled" Tag="FULFILLED"/>
+                                    <ComboBoxItem Content="Cancelled" Tag="CANCELLED"/>
+                                    <ComboBoxItem Content="Expired" Tag="EXPIRED"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Buttons -->
+                            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,20,0,0">
+                                <Button Content="🔍 Filter" 
+                                        Style="{StaticResource PrimaryButton}" 
+                                        Click="Filter_Click"
+                                        Margin="0,0,10,0"/>
+                                <Button Content="🔄 Clear Filters" 
+                                        Style="{StaticResource PrimaryButton}" 
+                                        Background="#95a5a6"
+                                        Click="ClearFilters_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <!-- Table -->
-                <Border Grid.Row="1" Background="White" Padding="30" CornerRadius="10">
+                <Border Grid.Row="2" Background="White" Padding="30" CornerRadius="10">
                     <Border.Effect>
                         <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="10"/>
                     </Border.Effect>

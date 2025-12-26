@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
@@ -153,6 +153,20 @@ namespace LibraryManagementSystem.View.Pages
                         return;
                     }
 
+                    // ✅ CHECK IF MEMBER IS SUSPENDED
+                    var memberDB = new MemberDB();
+                    bool isSuspended = memberDB.IsMemberSuspended(currentUser.UserIdString);
+                    if (isSuspended)
+                    {
+                        MessageBox.Show(
+                            "Your account is currently suspended. You cannot borrow books.\n\n" +
+                            "Please contact the library for more information.",
+                            "Account Suspended",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        return;
+                    }
+
                     if (!book.IsAvailable)
                     {
                         MessageBox.Show("This book is currently not available for borrowing.", "Not Available", 
@@ -215,6 +229,20 @@ namespace LibraryManagementSystem.View.Pages
                     {
                         MessageBox.Show("Please login to reserve books.", "Login Required", 
                             MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // ✅ CHECK IF MEMBER IS SUSPENDED
+                    var memberDB = new MemberDB();
+                    bool isSuspended = memberDB.IsMemberSuspended(currentUser.UserIdString);
+                    if (isSuspended)
+                    {
+                        MessageBox.Show(
+                            "Your account is currently suspended. You cannot reserve books.\n\n" +
+                            "Please contact the library for more information.",
+                            "Account Suspended",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
                         return;
                     }
 

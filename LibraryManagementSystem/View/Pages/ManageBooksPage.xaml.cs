@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
@@ -109,10 +109,11 @@ namespace LibraryManagementSystem.View.Pages
             // Filter books
             var filtered = allBooks.Where(book =>
             {
-                // Search filter (Title, Author, ISBN)
+                // Search filter (Title, Author, Publisher, ISBN)
                 var matchesSearch = string.IsNullOrEmpty(searchText) ||
                     book.Title.ToLower().Contains(searchText) ||
                     book.Author.ToLower().Contains(searchText) ||
+                    book.Publisher.ToLower().Contains(searchText) ||
                     book.ISBN.ToLower().Contains(searchText);
 
                 // Category filter
@@ -237,32 +238,82 @@ namespace LibraryManagementSystem.View.Pages
         {
             if (sender is Button button && button.Tag is BookManageModel book)
             {
-                var result = MessageBox.Show(
-                    $"Are you sure you want to retire this book?\n\n" +
-                    $"Title: {book.Title}\n" +
-                    $"ISBN: {book.ISBN}\n\n" +
-                    "This will set all copies to 0 and mark the book as retired.",
-                    "Confirm Retire Book",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
+                try
                 {
-                    try
+                    // Get copy statistics
+                    var stats = _bookDB.GetBookCopyStatistics(book.BookId);
+                    int totalCopies = stats.Total;
+                    int availableCopies = stats.Available;
+                    int unavailableCopies = stats.Unavailable;
+
+                    // Determine the appropriate message based on available copies
+                    string message;
+                    MessageBoxImage icon;
+                    
+                    if (availableCopies == 0)
                     {
-                        // TODO: Implement retire book functionality
-                        // This should update all copies to status = 'RETIRED'
-                        MessageBox.Show($"Book '{book.Title}' has been retired successfully.", 
-                            "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        // No copies available to retire
+                        message = $"There are no available copies of '{book.Title}' to retire.\n\n" +
+                                 $"Total copies: {totalCopies}\n" +
+                                 $"Available: {availableCopies}\n" +
+                                 $"Unavailable (Borrowed/Reserved/etc.): {unavailableCopies}\n\n" +
+                                 "Only available copies can be retired. Please wait for borrowed or reserved copies to be returned.";
+                        icon = MessageBoxImage.Information;
                         
-                        // Reload books
-                        LoadBooks();
+                        MessageBox.Show(message, "No Available Copies", MessageBoxButton.OK, icon);
+                        return;
                     }
-                    catch (Exception ex)
+                    else if (availableCopies == totalCopies)
                     {
-                        MessageBox.Show($"Error retiring book: {ex.Message}", "Error", 
-                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        // All copies are available
+                        message = $"All {totalCopies} copies of '{book.Title}' are currently available.\n\n" +
+                                 "Would you like to retire them all?";
+                        icon = MessageBoxImage.Question;
                     }
+                    else
+                    {
+                        // Some copies are available
+                        message = $"{availableCopies} out of {totalCopies} copies of '{book.Title}' are currently available.\n\n" +
+                                 $"Available copies: {availableCopies}\n" +
+                                 $"Unavailable copies: {unavailableCopies}\n\n" +
+                                 "Would you like to retire all available copies?";
+                        icon = MessageBoxImage.Question;
+                    }
+
+                    var result = MessageBox.Show(message, "Confirm Retire Book Copies", MessageBoxButton.YesNo, icon);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        // Retire available copies
+                        int retiredCount = _bookDB.RetireAvailableCopies(book.BookId);
+                        
+                        if (retiredCount > 0)
+                        {
+                            MessageBox.Show(
+                                $"Successfully retired {retiredCount} copy/copies of '{book.Title}'.\n\n" +
+                                $"Retired copies: {retiredCount}\n" +
+                                $"Remaining unavailable copies: {unavailableCopies}",
+                                "Success",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+                            
+                            // Reload books to update the display
+                            LoadBooks();
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                "No copies were retired. Please try again.",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error retiring book: {ex.Message}", "Error", 
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

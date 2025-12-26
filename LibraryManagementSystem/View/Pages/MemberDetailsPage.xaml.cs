@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
@@ -88,16 +88,6 @@ namespace LibraryManagementSystem.View.Pages
         }
 
         private void BackToMembers_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService?.Navigate(new ManageMembersPage());
-        }
-
-        private void NavDashboard_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService?.Navigate(new LibrarianDashboard());
-        }
-
-        private void NavMembers_Click(object sender, RoutedEventArgs e)
         {
             NavigationService?.Navigate(new ManageMembersPage());
         }

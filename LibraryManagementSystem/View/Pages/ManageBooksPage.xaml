@@ -173,7 +173,28 @@
                                      FontSize="14"
                                      Height="40"
                                      VerticalContentAlignment="Center"
-                                     KeyDown="TxtSearch_KeyDown"/>
+                                     KeyDown="TxtSearch_KeyDown">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <VisualBrush AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                                            <VisualBrush.Visual>
+                                                                <TextBlock Text="Search by title, author, publisher, or ISBN..." 
+                                                                          Foreground="#999" 
+                                                                          Margin="10,0,0,0" 
+                                                                          FontSize="14"/>
+                                                            </VisualBrush.Visual>
+                                                        </VisualBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
                         </StackPanel>
 
                         <!-- Category Filter -->

@@ -331,21 +331,73 @@
                             <DataGridTemplateColumn Header="Status" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource BadgeWarning}">
-                                            <TextBlock Text="{Binding Status}" Style="{StaticResource BadgeWarningText}"/>
+                                        <Border Padding="8,4" CornerRadius="5">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="RESERVED">
+                                                            <Setter Property="Background" Value="#d4edda"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="PENDING">
+                                                            <Setter Property="Background" Value="#fff3cd"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="CANCELLED">
+                                                            <Setter Property="Background" Value="#f8d7da"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding Status}" FontWeight="SemiBold" FontSize="11">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="RESERVED">
+                                                                <Setter Property="Foreground" Value="#155724"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="PENDING">
+                                                                <Setter Property="Foreground" Value="#856404"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="CANCELLED">
+                                                                <Setter Property="Foreground" Value="#721c24"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Action" Width="100">
+                            <DataGridTemplateColumn Header="Action" Width="180">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="❌ Cancel" 
-                                                Style="{StaticResource DangerButton}" 
-                                                Padding="8,4"
-                                                FontSize="11"
-                                                Click="CancelReservation_Click"
-                                                Tag="{Binding}"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <!-- Borrow button - only visible for RESERVED status -->
+                                            <Button Content="📚 Borrow" 
+                                                    Padding="8,4"
+                                                    FontSize="11"
+                                                    Margin="0,0,5,0"
+                                                    Click="BorrowReservedBook_Click"
+                                                    Tag="{Binding}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource SuccessButton}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="RESERVED">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <!-- Cancel button - always visible -->
+                                            <Button Content="❌ Cancel" 
+                                                    Style="{StaticResource DangerButton}" 
+                                                    Padding="8,4"
+                                                    FontSize="11"
+                                                    Click="CancelReservation_Click"
+                                                    Tag="{Binding}"/>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

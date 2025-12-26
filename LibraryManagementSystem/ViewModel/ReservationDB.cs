@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.OleDb;
 using LibraryManagementSystem.Model;
@@ -35,6 +35,74 @@ namespace LibraryManagementSystem.ViewModel
                     ORDER BY r.reservation_date DESC";
                 
                 return ExecuteQuery(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get reservations for management: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets reservations for management page with filtering
+        /// </summary>
+        /// <param name="memberName">Filter by member name (optional)</param>
+        /// <param name="bookTitle">Filter by book title (optional)</param>
+        /// <param name="status">Filter by status: ALL, PENDING, RESERVED, CANCELLED, FULFILLED, EXPIRED</param>
+        /// <returns>DataTable with reservation information</returns>
+        public DataTable GetReservationsForManagement(string memberName, string bookTitle, string status)
+        {
+            try
+            {
+                // Build WHERE clause based on filters
+                var whereConditions = new System.Collections.Generic.List<string>();
+                var parameters = new System.Collections.Generic.List<OleDbParameter>();
+
+                // Always include status filter to show relevant reservations
+                whereConditions.Add("r.reservation_status IN ('PENDING', 'RESERVED', 'CANCELLED', 'FULFILLED', 'EXPIRED')");
+
+                // Member name filter - search in first name, last name, or full name
+                if (!string.IsNullOrEmpty(memberName))
+                {
+                    whereConditions.Add("(u.first_name LIKE ? OR u.last_name LIKE ?)");
+                    string searchPattern = $"%{memberName}%";
+                    parameters.Add(new OleDbParameter("@FirstName", OleDbType.VarChar, 100) { Value = searchPattern });
+                    parameters.Add(new OleDbParameter("@LastName", OleDbType.VarChar, 100) { Value = searchPattern });
+                }
+
+                // Book title filter
+                if (!string.IsNullOrEmpty(bookTitle))
+                {
+                    whereConditions.Add("b.title LIKE ?");
+                    parameters.Add(new OleDbParameter("@BookTitle", OleDbType.VarChar, 200) { Value = $"%{bookTitle}%" });
+                }
+
+                // Status filter
+                if (!string.IsNullOrEmpty(status) && status != "ALL")
+                {
+                    whereConditions.Add("r.reservation_status = ?");
+                    parameters.Add(new OleDbParameter("@Status", OleDbType.VarChar, 20) { Value = status });
+                }
+
+                string whereClause = "WHERE " + string.Join(" AND ", whereConditions);
+
+                // Build query
+                string query = $@"
+                    SELECT 
+                        r.reservation_id,
+                        r.book_id,
+                        b.title AS BookTitle,
+                        u.first_name & ' ' & u.last_name AS MemberName,
+                        r.reservation_date,
+                        r.expiry_date,
+                        r.reservation_status
+                    FROM ((reservations r
+                    INNER JOIN books b ON r.book_id = b.book_id)
+                    INNER JOIN members m ON r.member_id = m.member_id)
+                    INNER JOIN users u ON m.user_id = u.user_id
+                    {whereClause}
+                    ORDER BY r.reservation_date DESC";
+
+                return ExecuteQuery(query, parameters.ToArray());
             }
             catch (Exception ex)
             {

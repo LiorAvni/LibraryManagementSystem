@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.OleDb;
 using LibraryManagementSystem.Model;
@@ -63,6 +63,22 @@ namespace LibraryManagementSystem.ViewModel
 
                 string whereClause = whereConditions.Count > 0 ? "WHERE " + string.Join(" AND ", whereConditions) : "";
 
+                // Create parameter collections for count query
+                var countParameters = new System.Collections.Generic.List<OleDbParameter>();
+                
+                // Rebuild parameters for count query
+                if (!string.IsNullOrEmpty(memberName))
+                {
+                    string searchPattern = $"%{memberName}%";
+                    countParameters.Add(new OleDbParameter("@FirstName", OleDbType.VarChar, 100) { Value = searchPattern });
+                    countParameters.Add(new OleDbParameter("@LastName", OleDbType.VarChar, 100) { Value = searchPattern });
+                }
+                
+                if (!string.IsNullOrEmpty(bookTitle))
+                {
+                    countParameters.Add(new OleDbParameter("@BookTitle", OleDbType.VarChar, 200) { Value = $"%{bookTitle}%" });
+                }
+
                 // Get total count
                 string countQuery = $@"
                     SELECT COUNT(*) 
@@ -73,7 +89,7 @@ namespace LibraryManagementSystem.ViewModel
                     INNER JOIN books b ON bc.book_id = b.book_id
                     {whereClause}";
 
-                object countResult = ExecuteScalar(countQuery, parameters.ToArray());
+                object countResult = ExecuteScalar(countQuery, countParameters.ToArray());
                 totalRecords = countResult != null ? Convert.ToInt32(countResult) : 0;
 
                 // Get paginated results
